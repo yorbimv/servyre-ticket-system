@@ -1,6 +1,6 @@
 # Guía de Despliegue
 
-Esta guía explica cómo desplegar el **Sistema de Tickets Servyre** tanto localmente para desarrollo como en la web para producción.
+Esta guía explica cómo desplegar el **Sistema de Tickets Servyre** tanto localmente para desarrollo como en la web para producción, con instrucciones específicas para tu sistema operativo.
 
 ---
 
@@ -17,6 +17,21 @@ Antes de comenzar, asegúrate de tener instalado lo siguiente:
 ## 2. Variables de Entorno
 
 La aplicación requiere variables de entorno para funcionar. Crea un archivo `.env` en el directorio raíz basándote en `.env.example`.
+
+### Configuración del archivo .env
+
+**Linux / macOS:**
+```bash
+cp .env.example .env
+# Luego edita el archivo .env con tu editor favorito, ej:
+# nano .env
+```
+
+**Windows (PowerShell):**
+```powershell
+Copy-Item .env.example .env
+# Luego abre el archivo .env con el Bloc de notas o VS Code
+```
 
 | Variable | Descripción | Requerido | Valor por Defecto |
 | :--- | :--- | :--- | :--- |
@@ -38,23 +53,32 @@ Para ejecutar la aplicación en tu computadora:
     pnpm install
     ```
 
-2.  **Configurar Entorno**:
-    Copia `.env.example` to `.env` y actualiza `DATABASE_URL` con tus credenciales locales de MySQL.
-
-3.  **Configurar Base de Datos**:
-    Sube el esquema a tu base de datos:
+2.  **Configurar Base de Datos**:
+    Sube el esquema a tu base de datos configurada en `.env`:
+    
     ```bash
     npm run db:push
     # o
     pnpm run db:push
     ```
 
-4.  **Iniciar Servidor de Desarrollo**:
+3.  **Iniciar Servidor de Desarrollo**:
+    
+    **Linux / macOS:**
     ```bash
     npm run dev
     # o
     pnpm run dev
     ```
+
+    **Windows:**
+    ```powershell
+    # Asegúrate de ejecutar esto en PowerShell o CMD
+    npm run dev
+    # o
+    pnpm run dev
+    ```
+
     La aplicación estará disponible en `http://localhost:5000` (o el puerto que hayas configurado).
 
 ---
@@ -69,7 +93,16 @@ Para probar la construcción de producción localmente:
     ```
 
 2.  **Iniciar el Servidor**:
+
+    **Linux / macOS:**
     ```bash
+    npm run start
+    ```
+
+    **Windows:**
+    ```powershell
+    # En Windows, asegúrate de que NODE_ENV esté seteado correctamente si el comando falla
+    # El script 'start' ya incluye 'NODE_ENV=production', así que debería funcionar directo:
     npm run start
     ```
 
@@ -108,3 +141,4 @@ Similar a Railway:
 
 *   **Errores de Base de Datos**: Asegúrate de que tu servidor MySQL esté corriendo y la cadena de conexión sea correcta.
 *   **Errores de Construcción**: Verifica que todas las dependencias estén instaladas. El uso de `npx` o `pnpm` simplifica esto.
+*   **Windows**: Si tienes problemas con comandos que establecen variables de entorno (como `NODE_ENV=...`), intenta usar una terminal como Git Bash o instala el paquete `cross-env` (`npm install -D cross-env`) y actualiza los scripts en `package.json`.
