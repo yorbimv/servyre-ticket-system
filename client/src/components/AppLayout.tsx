@@ -2,7 +2,16 @@ import React, { useState } from "react";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { useLocation } from "wouter";
-import { Menu, X, LogOut, Bell, TicketIcon, BarChart3, Settings, Home } from "lucide-react";
+import {
+  Menu,
+  X,
+  LogOut,
+  Bell,
+  TicketIcon,
+  BarChart3,
+  Settings,
+  Home,
+} from "lucide-react";
 import { trpc } from "@/lib/trpc";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -56,7 +65,9 @@ export default function AppLayout({ children }: AppLayoutProps) {
     },
   ];
 
-  const visibleMenuItems = menuItems.filter(item => item.roles.includes(user?.role || ""));
+  const visibleMenuItems = menuItems.filter(item =>
+    item.roles.includes(user?.role || "")
+  );
 
   const handleLogout = async () => {
     await logout();
@@ -73,7 +84,9 @@ export default function AppLayout({ children }: AppLayoutProps) {
       >
         {/* Logo */}
         <div className="p-4 border-b border-slate-700 flex items-center justify-between">
-          <div className={`flex items-center gap-2 ${!sidebarOpen && "justify-center w-full"}`}>
+          <div
+            className={`flex items-center gap-2 ${!sidebarOpen && "justify-center w-full"}`}
+          >
             <div className="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center font-bold">
               S
             </div>
@@ -83,7 +96,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
 
         {/* Menu Items */}
         <nav className="flex-1 p-4 space-y-2">
-          {visibleMenuItems.map((item) => (
+          {visibleMenuItems.map(item => (
             <button
               key={item.href}
               onClick={() => navigate(item.href)}
@@ -100,7 +113,9 @@ export default function AppLayout({ children }: AppLayoutProps) {
 
         {/* User Section */}
         <div className="p-4 border-t border-slate-700">
-          <div className={`flex items-center gap-2 ${!sidebarOpen && "justify-center"}`}>
+          <div
+            className={`flex items-center gap-2 ${!sidebarOpen && "justify-center"}`}
+          >
             <div className="w-8 h-8 bg-blue-400 rounded-full flex items-center justify-center text-sm font-bold">
               {user?.name?.charAt(0).toUpperCase()}
             </div>
@@ -148,13 +163,15 @@ export default function AppLayout({ children }: AppLayoutProps) {
               <DropdownMenuContent align="end" className="w-80">
                 {unreadNotifications && unreadNotifications.length > 0 ? (
                   <div className="max-h-96 overflow-y-auto">
-                    {unreadNotifications.map((notif) => (
+                    {unreadNotifications.map(notif => (
                       <DropdownMenuItem
                         key={notif.id}
                         className="flex flex-col items-start p-3 cursor-pointer"
                       >
                         <p className="font-medium text-sm">{notif.title}</p>
-                        <p className="text-xs text-muted-foreground">{notif.message}</p>
+                        <p className="text-xs text-muted-foreground">
+                          {notif.message}
+                        </p>
                       </DropdownMenuItem>
                     ))}
                   </div>
@@ -178,10 +195,15 @@ export default function AppLayout({ children }: AppLayoutProps) {
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
                 <DropdownMenuItem disabled>
-                  <span className="text-xs text-muted-foreground">{user?.email}</span>
+                  <span className="text-xs text-muted-foreground">
+                    {user?.email}
+                  </span>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={handleLogout} className="text-red-600">
+                <DropdownMenuItem
+                  onClick={handleLogout}
+                  className="text-red-600"
+                >
                   <LogOut className="w-4 h-4 mr-2" />
                   Cerrar Sesión
                 </DropdownMenuItem>
@@ -191,9 +213,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
         </header>
 
         {/* Page Content */}
-        <main className="flex-1 overflow-auto">
-          {children}
-        </main>
+        <main className="flex-1 overflow-auto">{children}</main>
       </div>
     </div>
   );

@@ -5,6 +5,7 @@ Sistema completo de gestión de tickets de soporte IT para la empresa Servyre. P
 ## 🎯 Características Principales
 
 **Gestión de Tickets**
+
 - Creación de tickets con título, descripción, prioridad y categoría
 - Seguimiento visual del estado en tiempo real
 - Historial completo de cambios y actualizaciones
@@ -12,17 +13,20 @@ Sistema completo de gestión de tickets de soporte IT para la empresa Servyre. P
 - Adjuntos de archivos y fotografías
 
 **Roles y Permisos**
+
 - **Usuarios Finales**: Crean tickets, ven estado y reciben actualizaciones
 - **Técnicos IT**: Ven todos los tickets, asignan, actualizan estados y agregan reportes
 - **Administradores**: Acceso completo, dashboard, reportes y configuración
 
 **Dashboard y Reportería**
+
 - Dashboard interactivo con métricas en tiempo real
 - Gráficos de tickets por estado, prioridad y categoría
 - Generación de reportes PDF mensuales
 - Estadísticas de rendimiento y tiempo de resolución
 
 **Notificaciones**
+
 - Notificaciones automáticas al crear tickets
 - Alertas de cambios de estado
 - Notificaciones de comentarios
@@ -38,6 +42,7 @@ Antes de instalar, asegúrate de tener instalado:
 - **Git**: Para clonar el repositorio
 
 Verifica las versiones con:
+
 ```bash
 node --version
 pnpm --version
@@ -137,6 +142,7 @@ La aplicación estará disponible en `http://localhost:3000`
 **Seguimiento de Ticket**
 
 En la página de detalles del ticket puedes:
+
 - Ver el estado actual (Abierto, En Progreso, Resuelto, Cerrado)
 - Leer comentarios del equipo técnico
 - Ver el historial completo de cambios
@@ -243,33 +249,36 @@ servyre-ticket-system/
 
 El sistema utiliza las siguientes tablas principales:
 
-| Tabla | Descripción |
-|-------|-------------|
-| `users` | Usuarios del sistema con roles |
-| `tickets` | Tickets de soporte con información completa |
-| `ticket_comments` | Comentarios en tickets |
-| `attachments` | Archivos adjuntos en tickets |
-| `categories` | Categorías de tickets |
-| `ticket_statuses` | Estados posibles de tickets |
-| `priorities` | Niveles de prioridad |
-| `ticket_history` | Historial de cambios en tickets |
-| `notifications` | Notificaciones del sistema |
-| `activity_logs` | Registro de actividades |
+| Tabla             | Descripción                                 |
+| ----------------- | ------------------------------------------- |
+| `users`           | Usuarios del sistema con roles              |
+| `tickets`         | Tickets de soporte con información completa |
+| `ticket_comments` | Comentarios en tickets                      |
+| `attachments`     | Archivos adjuntos en tickets                |
+| `categories`      | Categorías de tickets                       |
+| `ticket_statuses` | Estados posibles de tickets                 |
+| `priorities`      | Niveles de prioridad                        |
+| `ticket_history`  | Historial de cambios en tickets             |
+| `notifications`   | Notificaciones del sistema                  |
+| `activity_logs`   | Registro de actividades                     |
 
 ## 🔐 Seguridad
 
 **Autenticación**
+
 - Utiliza OAuth 2.0 con Manus
 - Solo usuarios con dominio @servyre.com pueden acceder
 - Las sesiones se almacenan de forma segura con JWT
 
 **Autorización**
+
 - Control de acceso basado en roles (RBAC)
 - Los usuarios finales solo ven sus propios tickets
 - Los técnicos pueden ver todos los tickets
 - Los administradores tienen acceso completo
 
 **Datos**
+
 - Todas las contraseñas se hashean
 - Las conexiones a la base de datos usan SSL
 - Los archivos se almacenan en S3 con acceso controlado
@@ -300,21 +309,25 @@ pnpm format             # Formatea código
 ## 🐛 Solución de Problemas
 
 **Error: "Base de datos no disponible"**
+
 - Verifica que MySQL/TiDB está corriendo
 - Comprueba la variable `DATABASE_URL` en `.env.local`
 - Asegúrate de que el usuario y contraseña son correctos
 
 **Error: "No tienes permisos para acceder"**
+
 - Verifica tu rol en la base de datos
 - Asegúrate de estar usando la cuenta correcta
 - Contacta con un administrador para cambiar permisos
 
 **Error: "OAuth no configurado"**
+
 - Verifica que `VITE_APP_ID` está configurado correctamente
 - Comprueba que `OAUTH_SERVER_URL` es accesible
 - Reinicia el servidor de desarrollo
 
 **Los cambios no se reflejan**
+
 - Limpia el caché del navegador (Ctrl+Shift+Del)
 - Recarga la página (Ctrl+R o Cmd+R)
 - Reinicia el servidor de desarrollo
@@ -330,6 +343,7 @@ pnpm format             # Formatea código
 Para desplegar la aplicación en producción:
 
 1. **Compilar el proyecto**
+
    ```bash
    pnpm build
    ```
@@ -339,6 +353,7 @@ Para desplegar la aplicación en producción:
    - Asegúrate de usar una base de datos de producción
 
 3. **Iniciar el servidor**
+
    ```bash
    pnpm start
    ```
@@ -350,6 +365,7 @@ Para desplegar la aplicación en producción:
 ## 📞 Soporte y Contacto
 
 Para reportar problemas o sugerencias:
+
 - Crea un issue en el repositorio de GitHub
 - Contacta al equipo de desarrollo
 - Consulta la documentación en línea

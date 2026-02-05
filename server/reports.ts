@@ -16,13 +16,16 @@ interface ReportData {
   topTechnicians: Array<{ name: string; ticketsResolved: number }>;
 }
 
-export async function generateMonthlyReport(month: number, year: number): Promise<Buffer> {
+export async function generateMonthlyReport(
+  month: number,
+  year: number
+): Promise<Buffer> {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
 
   // Obtener todos los tickets del mes
   const allTickets = await getAllTickets();
-  
+
   const startDate = new Date(year, month - 1, 1);
   const endDate = new Date(year, month, 0);
 
@@ -47,7 +50,9 @@ export async function generateMonthlyReport(month: number, year: number): Promis
 
   const averageResolutionTime =
     resolutionTimes.length > 0
-      ? (resolutionTimes.reduce((a, b) => a + b, 0) / resolutionTimes.length).toFixed(2)
+      ? (
+          resolutionTimes.reduce((a, b) => a + b, 0) / resolutionTimes.length
+        ).toFixed(2)
       : "N/A";
 
   // Agrupar por categoría
@@ -59,18 +64,18 @@ export async function generateMonthlyReport(month: number, year: number): Promis
 
   // Agrupar por prioridad
   const ticketsByPriority: Record<string, number> = {
-    "Crítica": monthTickets.filter(t => t.priorityId === 1).length,
-    "Alta": monthTickets.filter(t => t.priorityId === 2).length,
-    "Media": monthTickets.filter(t => t.priorityId === 3).length,
-    "Baja": monthTickets.filter(t => t.priorityId === 4).length,
+    Crítica: monthTickets.filter(t => t.priorityId === 1).length,
+    Alta: monthTickets.filter(t => t.priorityId === 2).length,
+    Media: monthTickets.filter(t => t.priorityId === 3).length,
+    Baja: monthTickets.filter(t => t.priorityId === 4).length,
   };
 
   // Agrupar por estado
   const ticketsByStatus: Record<string, number> = {
-    "Abierto": monthTickets.filter(t => t.statusId === 1).length,
+    Abierto: monthTickets.filter(t => t.statusId === 1).length,
     "En Progreso": monthTickets.filter(t => t.statusId === 2).length,
-    "Resuelto": monthTickets.filter(t => t.statusId === 3).length,
-    "Cerrado": monthTickets.filter(t => t.statusId === 4).length,
+    Resuelto: monthTickets.filter(t => t.statusId === 3).length,
+    Cerrado: monthTickets.filter(t => t.statusId === 4).length,
   };
 
   // Crear documento PDF
@@ -212,9 +217,12 @@ export async function generateMonthlyReport(month: number, year: number): Promis
   return Buffer.from(pdfBytes);
 }
 
-export async function getReportData(month: number, year: number): Promise<ReportData> {
+export async function getReportData(
+  month: number,
+  year: number
+): Promise<ReportData> {
   const allTickets = await getAllTickets();
-  
+
   const startDate = new Date(year, month - 1, 1);
   const endDate = new Date(year, month, 0);
 
@@ -237,7 +245,9 @@ export async function getReportData(month: number, year: number): Promise<Report
 
   const averageResolutionTime =
     resolutionTimes.length > 0
-      ? (resolutionTimes.reduce((a, b) => a + b, 0) / resolutionTimes.length).toFixed(2)
+      ? (
+          resolutionTimes.reduce((a, b) => a + b, 0) / resolutionTimes.length
+        ).toFixed(2)
       : "N/A";
 
   const ticketsByCategory: Record<string, number> = {};
@@ -247,21 +257,23 @@ export async function getReportData(month: number, year: number): Promise<Report
   });
 
   const ticketsByPriority: Record<string, number> = {
-    "Crítica": monthTickets.filter(t => t.priorityId === 1).length,
-    "Alta": monthTickets.filter(t => t.priorityId === 2).length,
-    "Media": monthTickets.filter(t => t.priorityId === 3).length,
-    "Baja": monthTickets.filter(t => t.priorityId === 4).length,
+    Crítica: monthTickets.filter(t => t.priorityId === 1).length,
+    Alta: monthTickets.filter(t => t.priorityId === 2).length,
+    Media: monthTickets.filter(t => t.priorityId === 3).length,
+    Baja: monthTickets.filter(t => t.priorityId === 4).length,
   };
 
   const ticketsByStatus: Record<string, number> = {
-    "Abierto": monthTickets.filter(t => t.statusId === 1).length,
+    Abierto: monthTickets.filter(t => t.statusId === 1).length,
     "En Progreso": monthTickets.filter(t => t.statusId === 2).length,
-    "Resuelto": monthTickets.filter(t => t.statusId === 3).length,
-    "Cerrado": monthTickets.filter(t => t.statusId === 4).length,
+    Resuelto: monthTickets.filter(t => t.statusId === 3).length,
+    Cerrado: monthTickets.filter(t => t.statusId === 4).length,
   };
 
   return {
-    month: new Date(year, month - 1).toLocaleDateString("es-ES", { month: "long" }),
+    month: new Date(year, month - 1).toLocaleDateString("es-ES", {
+      month: "long",
+    }),
     year,
     totalTickets,
     resolvedTickets,

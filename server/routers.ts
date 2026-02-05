@@ -3,15 +3,35 @@ import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
 import { publicProcedure, router, protectedProcedure } from "./_core/trpc";
 import { TRPCError } from "@trpc/server";
-import { getDb, getCategories, getTicketStatuses, getPriorities, getTechnicians, getUserTickets, getAllTickets } from "./db";
+import {
+  getDb,
+  getCategories,
+  getTicketStatuses,
+  getPriorities,
+  getTechnicians,
+  getUserTickets,
+  getAllTickets,
+} from "./db";
 import { z } from "zod";
-import { tickets, ticketStatuses, categories, priorities, ticketComments, attachments, ticketHistory, notifications } from "../drizzle/schema";
+import {
+  tickets,
+  ticketStatuses,
+  categories,
+  priorities,
+  ticketComments,
+  attachments,
+  ticketHistory,
+  notifications,
+} from "../drizzle/schema";
 import { eq, and, or, like, desc, asc } from "drizzle-orm";
 
 // Procedimiento protegido solo para técnicos
 const technicianProcedure = protectedProcedure.use(({ ctx, next }) => {
   if (ctx.user.role !== "technician" && ctx.user.role !== "admin") {
-    throw new TRPCError({ code: "FORBIDDEN", message: "Solo técnicos y administradores pueden acceder" });
+    throw new TRPCError({
+      code: "FORBIDDEN",
+      message: "Solo técnicos y administradores pueden acceder",
+    });
   }
   return next({ ctx });
 });
@@ -19,7 +39,10 @@ const technicianProcedure = protectedProcedure.use(({ ctx, next }) => {
 // Procedimiento protegido solo para administradores
 const adminProcedure = protectedProcedure.use(({ ctx, next }) => {
   if (ctx.user.role !== "admin") {
-    throw new TRPCError({ code: "FORBIDDEN", message: "Solo administradores pueden acceder" });
+    throw new TRPCError({
+      code: "FORBIDDEN",
+      message: "Solo administradores pueden acceder",
+    });
   }
   return next({ ctx });
 });
@@ -57,22 +80,36 @@ export const appRouter = router({
   tickets: router({
     // Crear ticket (usuarios finales, técnicos y admins)
     create: protectedProcedure
-      .input(z.object({
-        title: z.string().min(5, "El título debe tener al menos 5 caracteres"),
-        description: z.string().min(10, "La descripción debe tener al menos 10 caracteres"),
-        categoryId: z.number(),
-        priorityId: z.number(),
-      }))
+      .input(
+        z.object({
+          title: z
+            .string()
+            .min(5, "El título debe tener al menos 5 caracteres"),
+          description: z
+            .string()
+            .min(10, "La descripción debe tener al menos 10 caracteres"),
+          categoryId: z.number(),
+          priorityId: z.number(),
+        })
+      )
       .mutation(async ({ ctx, input }) => {
         const db = await getDb();
-        if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Base de datos no disponible" });
+        if (!db)
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "Base de datos no disponible",
+          });
 
         // Obtener el estado inicial (abierto/nuevo)
         const statuses = await getTicketStatuses();
-        const initialStatus = statuses.find(s => s.name === "open") || statuses[0];
-        
+        const initialStatus =
+          statuses.find(s => s.name === "open") || statuses[0];
+
         if (!initialStatus) {
-          throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Estado inicial no encontrado" });
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "Estado inicial no encontrado",
+          });
         }
 
         // Generar número de ticket único
@@ -102,8 +139,11 @@ export const appRouter = router({
         });
 
         // Crear notificación para administradores
-        const admins = await db.select().from(require("../drizzle/schema").users).where(eq(require("../drizzle/schema").users.role, "admin"));
-        
+        const admins = await db
+          .select()
+          .from(require("../drizzle/schema").users)
+          .where(eq(require("../drizzle/schema").users.role, "admin"));
+
         for (const admin of admins) {
           await db.insert(notifications).values({
             userId: admin.id,
@@ -136,19 +176,30 @@ export const appRouter = router({
         const db = await getDb();
         if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
 
-        const result = await db.select().from(tickets).where(eq(tickets.id, input.ticketId)).limit(1);
+        const result = await db
+          .select()
+          .from(tickets)
+          .where(eq(tickets.id, input.ticketId))
+          .limit(1);
         const ticket = result[0];
 
         if (!ticket) {
-          throw new TRPCError({ code: "NOT_FOUND", message: "Ticket no encontrado" });
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: "Ticket no encontrado",
+          });
         }
 
         // Verificar permisos
         const isCreator = ticket.createdByUserId === ctx.user.id;
-        const isTechnicianOrAdmin = ctx.user.role === "technician" || ctx.user.role === "admin";
+        const isTechnicianOrAdmin =
+          ctx.user.role === "technician" || ctx.user.role === "admin";
 
         if (!isCreator && !isTechnicianOrAdmin) {
-          throw new TRPCError({ code: "FORBIDDEN", message: "No tienes permisos para ver este ticket" });
+          throw new TRPCError({
+            code: "FORBIDDEN",
+            message: "No tienes permisos para ver este ticket",
+          });
         }
 
         return ticket;
@@ -156,43 +207,65 @@ export const appRouter = router({
 
     // Actualizar ticket (técnicos y admins)
     update: technicianProcedure
-      .input(z.object({
-        ticketId: z.number(),
-        statusId: z.number().optional(),
-        priorityId: z.number().optional(),
-        assignedToUserId: z.number().optional(),
-        technicalReport: z.string().optional(),
-        resolutionNotes: z.string().optional(),
-      }))
+      .input(
+        z.object({
+          ticketId: z.number(),
+          statusId: z.number().optional(),
+          priorityId: z.number().optional(),
+          assignedToUserId: z.number().optional(),
+          technicalReport: z.string().optional(),
+          resolutionNotes: z.string().optional(),
+        })
+      )
       .mutation(async ({ ctx, input }) => {
         const db = await getDb();
         if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
 
-        const ticket = await db.select().from(tickets).where(eq(tickets.id, input.ticketId)).limit(1);
+        const ticket = await db
+          .select()
+          .from(tickets)
+          .where(eq(tickets.id, input.ticketId))
+          .limit(1);
         if (!ticket.length) {
-          throw new TRPCError({ code: "NOT_FOUND", message: "Ticket no encontrado" });
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: "Ticket no encontrado",
+          });
         }
 
         const updates: any = { updatedAt: new Date() };
         const changes: string[] = [];
 
-        if (input.statusId !== undefined && input.statusId !== ticket[0].statusId) {
+        if (
+          input.statusId !== undefined &&
+          input.statusId !== ticket[0].statusId
+        ) {
           updates.statusId = input.statusId;
           changes.push(`Estado cambiado`);
-          
+
           // Si se marca como resuelto, registrar fecha de resolución
-          const newStatus = await db.select().from(ticketStatuses).where(eq(ticketStatuses.id, input.statusId)).limit(1);
+          const newStatus = await db
+            .select()
+            .from(ticketStatuses)
+            .where(eq(ticketStatuses.id, input.statusId))
+            .limit(1);
           if (newStatus[0]?.name === "resolved") {
             updates.resolvedAt = new Date();
           }
         }
 
-        if (input.priorityId !== undefined && input.priorityId !== ticket[0].priorityId) {
+        if (
+          input.priorityId !== undefined &&
+          input.priorityId !== ticket[0].priorityId
+        ) {
           updates.priorityId = input.priorityId;
           changes.push(`Prioridad actualizada`);
         }
 
-        if (input.assignedToUserId !== undefined && input.assignedToUserId !== ticket[0].assignedToUserId) {
+        if (
+          input.assignedToUserId !== undefined &&
+          input.assignedToUserId !== ticket[0].assignedToUserId
+        ) {
           updates.assignedToUserId = input.assignedToUserId;
           changes.push(`Asignado a técnico`);
         }
@@ -207,7 +280,10 @@ export const appRouter = router({
           changes.push(`Notas de resolución actualizadas`);
         }
 
-        await db.update(tickets).set(updates).where(eq(tickets.id, input.ticketId));
+        await db
+          .update(tickets)
+          .set(updates)
+          .where(eq(tickets.id, input.ticketId));
 
         // Registrar cambios en historial
         for (const change of changes) {
@@ -237,23 +313,33 @@ export const appRouter = router({
 
     // Agregar comentario
     addComment: protectedProcedure
-      .input(z.object({
-        ticketId: z.number(),
-        content: z.string().min(1),
-        isInternal: z.boolean().default(false),
-      }))
+      .input(
+        z.object({
+          ticketId: z.number(),
+          content: z.string().min(1),
+          isInternal: z.boolean().default(false),
+        })
+      )
       .mutation(async ({ ctx, input }) => {
         const db = await getDb();
         if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
 
         // Verificar que el ticket existe y el usuario tiene permisos
-        const ticket = await db.select().from(tickets).where(eq(tickets.id, input.ticketId)).limit(1);
+        const ticket = await db
+          .select()
+          .from(tickets)
+          .where(eq(tickets.id, input.ticketId))
+          .limit(1);
         if (!ticket.length) {
-          throw new TRPCError({ code: "NOT_FOUND", message: "Ticket no encontrado" });
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: "Ticket no encontrado",
+          });
         }
 
         const isCreator = ticket[0].createdByUserId === ctx.user.id;
-        const isTechnicianOrAdmin = ctx.user.role === "technician" || ctx.user.role === "admin";
+        const isTechnicianOrAdmin =
+          ctx.user.role === "technician" || ctx.user.role === "admin";
 
         if (!isCreator && !isTechnicianOrAdmin) {
           throw new TRPCError({ code: "FORBIDDEN" });
@@ -261,7 +347,10 @@ export const appRouter = router({
 
         // Comentarios internos solo para técnicos y admins
         if (input.isInternal && !isTechnicianOrAdmin) {
-          throw new TRPCError({ code: "FORBIDDEN", message: "Solo técnicos pueden agregar comentarios internos" });
+          throw new TRPCError({
+            code: "FORBIDDEN",
+            message: "Solo técnicos pueden agregar comentarios internos",
+          });
         }
 
         const result = await db.insert(ticketComments).values({
@@ -307,20 +396,28 @@ export const appRouter = router({
         if (!db) return [];
 
         // Verificar permisos
-        const ticket = await db.select().from(tickets).where(eq(tickets.id, input.ticketId)).limit(1);
+        const ticket = await db
+          .select()
+          .from(tickets)
+          .where(eq(tickets.id, input.ticketId))
+          .limit(1);
         if (!ticket.length) return [];
 
         const isCreator = ticket[0].createdByUserId === ctx.user.id;
-        const isTechnicianOrAdmin = ctx.user.role === "technician" || ctx.user.role === "admin";
+        const isTechnicianOrAdmin =
+          ctx.user.role === "technician" || ctx.user.role === "admin";
 
         if (!isCreator && !isTechnicianOrAdmin) return [];
 
         // Si es usuario final, no mostrar comentarios internos
-        const whereClause = isTechnicianOrAdmin 
-          ? undefined 
+        const whereClause = isTechnicianOrAdmin
+          ? undefined
           : eq(ticketComments.isInternal, false);
 
-        const comments = await db.select().from(ticketComments).where(whereClause ? whereClause : undefined);
+        const comments = await db
+          .select()
+          .from(ticketComments)
+          .where(whereClause ? whereClause : undefined);
         return comments.filter(c => c.ticketId === input.ticketId);
       }),
 
@@ -331,15 +428,23 @@ export const appRouter = router({
         const db = await getDb();
         if (!db) return [];
 
-        const ticket = await db.select().from(tickets).where(eq(tickets.id, input.ticketId)).limit(1);
+        const ticket = await db
+          .select()
+          .from(tickets)
+          .where(eq(tickets.id, input.ticketId))
+          .limit(1);
         if (!ticket.length) return [];
 
         const isCreator = ticket[0].createdByUserId === ctx.user.id;
-        const isTechnicianOrAdmin = ctx.user.role === "technician" || ctx.user.role === "admin";
+        const isTechnicianOrAdmin =
+          ctx.user.role === "technician" || ctx.user.role === "admin";
 
         if (!isCreator && !isTechnicianOrAdmin) return [];
 
-        const history = await db.select().from(ticketHistory).where(eq(ticketHistory.ticketId, input.ticketId));
+        const history = await db
+          .select()
+          .from(ticketHistory)
+          .where(eq(ticketHistory.ticketId, input.ticketId));
         return history;
       }),
   }),
@@ -350,12 +455,15 @@ export const appRouter = router({
       const db = await getDb();
       if (!db) return [];
 
-      const userNotifications = await db.select().from(notifications).where(
-        and(
-          eq(notifications.userId, ctx.user.id),
-          eq(notifications.isRead, false)
-        )
-      );
+      const userNotifications = await db
+        .select()
+        .from(notifications)
+        .where(
+          and(
+            eq(notifications.userId, ctx.user.id),
+            eq(notifications.isRead, false)
+          )
+        );
       return userNotifications;
     }),
 
@@ -365,7 +473,10 @@ export const appRouter = router({
         const db = await getDb();
         if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
 
-        await db.update(notifications).set({ isRead: true }).where(eq(notifications.id, input.notificationId));
+        await db
+          .update(notifications)
+          .set({ isRead: true })
+          .where(eq(notifications.id, input.notificationId));
         return { success: true };
       }),
   }),
@@ -385,15 +496,20 @@ export const appRouter = router({
         totalTickets,
         openTickets,
         resolvedTickets,
-        resolutionRate: totalTickets > 0 ? ((resolvedTickets / totalTickets) * 100).toFixed(2) : "0",
+        resolutionRate:
+          totalTickets > 0
+            ? ((resolvedTickets / totalTickets) * 100).toFixed(2)
+            : "0",
       };
     }),
 
     generateReport: adminProcedure
-      .input(z.object({
-        month: z.number().min(1).max(12),
-        year: z.number().min(2000).max(2100),
-      }))
+      .input(
+        z.object({
+          month: z.number().min(1).max(12),
+          year: z.number().min(2000).max(2100),
+        })
+      )
       .mutation(async ({ input }) => {
         const { generateMonthlyReport } = await import("./reports");
         const pdfBuffer = await generateMonthlyReport(input.month, input.year);

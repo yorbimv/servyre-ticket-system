@@ -1,7 +1,13 @@
 import { useRoute } from "wouter";
 import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Loader2, ArrowLeft, MessageSquare } from "lucide-react";
 import { useLocation } from "wouter";
@@ -15,7 +21,9 @@ export default function TicketDetail() {
   const [, params] = useRoute("/tickets/:id");
   const ticketId = params?.id ? parseInt(params.id) : 0;
 
-  const { data: ticket, isLoading } = trpc.tickets.getById.useQuery({ ticketId });
+  const { data: ticket, isLoading } = trpc.tickets.getById.useQuery({
+    ticketId,
+  });
   const { data: comments } = trpc.tickets.getComments.useQuery({ ticketId });
   const { data: history } = trpc.tickets.getHistory.useQuery({ ticketId });
   const [commentText, setCommentText] = useState("");
@@ -89,14 +97,22 @@ export default function TicketDetail() {
       <div className="p-6 max-w-4xl mx-auto space-y-6">
         {/* Header */}
         <div>
-          <Button variant="ghost" onClick={() => navigate("/my-tickets")} className="mb-4">
+          <Button
+            variant="ghost"
+            onClick={() => navigate("/my-tickets")}
+            className="mb-4"
+          >
             <ArrowLeft className="w-4 h-4 mr-2" />
             Volver
           </Button>
           <div className="flex items-start justify-between">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">{ticket.title}</h1>
-              <p className="text-gray-600 mt-1">Ticket: {ticket.ticketNumber}</p>
+              <h1 className="text-3xl font-bold text-gray-900">
+                {ticket.title}
+              </h1>
+              <p className="text-gray-600 mt-1">
+                Ticket: {ticket.ticketNumber}
+              </p>
             </div>
           </div>
         </div>
@@ -111,18 +127,35 @@ export default function TicketDetail() {
               <div className="flex-1">
                 <div className="flex items-center gap-4">
                   <Badge className={getStatusColor(ticket.statusId)}>
-                    {ticket.statusId === 1 ? "Abierto" : ticket.statusId === 2 ? "En Progreso" : ticket.statusId === 3 ? "Resuelto" : "Cerrado"}
+                    {ticket.statusId === 1
+                      ? "Abierto"
+                      : ticket.statusId === 2
+                        ? "En Progreso"
+                        : ticket.statusId === 3
+                          ? "Resuelto"
+                          : "Cerrado"}
                   </Badge>
                   <Badge className={getPriorityColor(ticket.priorityId)}>
-                    Prioridad: {ticket.priorityId === 1 ? "Crítica" : ticket.priorityId === 2 ? "Alta" : ticket.priorityId === 3 ? "Media" : "Baja"}
+                    Prioridad:{" "}
+                    {ticket.priorityId === 1
+                      ? "Crítica"
+                      : ticket.priorityId === 2
+                        ? "Alta"
+                        : ticket.priorityId === 3
+                          ? "Media"
+                          : "Baja"}
                   </Badge>
                 </div>
               </div>
               <div className="text-right text-sm text-gray-500">
-                <p>Creado: {new Date(ticket.createdAt).toLocaleDateString("es-ES")}</p>
+                <p>
+                  Creado:{" "}
+                  {new Date(ticket.createdAt).toLocaleDateString("es-ES")}
+                </p>
                 {ticket.resolvedAt && (
                   <p className="text-green-600">
-                    Resuelto: {new Date(ticket.resolvedAt).toLocaleDateString("es-ES")}
+                    Resuelto:{" "}
+                    {new Date(ticket.resolvedAt).toLocaleDateString("es-ES")}
                   </p>
                 )}
               </div>
@@ -136,7 +169,9 @@ export default function TicketDetail() {
             <CardTitle>Descripción</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-gray-700 whitespace-pre-wrap">{ticket.description}</p>
+            <p className="text-gray-700 whitespace-pre-wrap">
+              {ticket.description}
+            </p>
           </CardContent>
         </Card>
 
@@ -147,7 +182,9 @@ export default function TicketDetail() {
               <CardTitle>Reporte Técnico</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-gray-700 whitespace-pre-wrap">{ticket.technicalReport}</p>
+              <p className="text-gray-700 whitespace-pre-wrap">
+                {ticket.technicalReport}
+              </p>
             </CardContent>
           </Card>
         )}
@@ -166,7 +203,7 @@ export default function TicketDetail() {
               <Textarea
                 placeholder="Agregar un comentario..."
                 value={commentText}
-                onChange={(e) => setCommentText(e.target.value)}
+                onChange={e => setCommentText(e.target.value)}
                 rows={3}
               />
               <Button
@@ -174,7 +211,9 @@ export default function TicketDetail() {
                 disabled={addComment.isPending}
                 className="w-full"
               >
-                {addComment.isPending && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+                {addComment.isPending && (
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                )}
                 Enviar Comentario
               </Button>
             </div>
@@ -182,12 +221,14 @@ export default function TicketDetail() {
             {/* Comments List */}
             <div className="space-y-3 border-t pt-4">
               {comments && comments.length > 0 ? (
-                comments.map((comment) => (
+                comments.map(comment => (
                   <div key={comment.id} className="bg-gray-50 p-3 rounded-lg">
                     <div className="flex items-start justify-between mb-1">
                       <p className="font-medium text-sm">Usuario</p>
                       <p className="text-xs text-gray-500">
-                        {new Date(comment.createdAt).toLocaleDateString("es-ES")}
+                        {new Date(comment.createdAt).toLocaleDateString(
+                          "es-ES"
+                        )}
                       </p>
                     </div>
                     <p className="text-gray-700 text-sm">{comment.content}</p>
@@ -210,8 +251,11 @@ export default function TicketDetail() {
           <CardContent>
             <div className="space-y-2">
               {history && history.length > 0 ? (
-                history.map((entry) => (
-                  <div key={entry.id} className="flex items-start gap-3 pb-2 border-b last:border-0">
+                history.map(entry => (
+                  <div
+                    key={entry.id}
+                    className="flex items-start gap-3 pb-2 border-b last:border-0"
+                  >
                     <div className="text-xs text-gray-500 min-w-fit">
                       {new Date(entry.createdAt).toLocaleDateString("es-ES")}
                     </div>
@@ -226,7 +270,9 @@ export default function TicketDetail() {
                   </div>
                 ))
               ) : (
-                <p className="text-gray-500 text-sm">No hay cambios registrados</p>
+                <p className="text-gray-500 text-sm">
+                  No hay cambios registrados
+                </p>
               )}
             </div>
           </CardContent>

@@ -68,16 +68,12 @@
       "indexes": {
         "userId_idx": {
           "name": "userId_idx",
-          "columns": [
-            "userId"
-          ],
+          "columns": ["userId"],
           "isUnique": false
         },
         "createdAt_idx": {
           "name": "createdAt_idx",
-          "columns": [
-            "createdAt"
-          ],
+          "columns": ["createdAt"],
           "isUnique": false
         }
       },
@@ -85,9 +81,7 @@
       "compositePrimaryKeys": {
         "activity_logs_id": {
           "name": "activity_logs_id",
-          "columns": [
-            "id"
-          ]
+          "columns": ["id"]
         }
       },
       "uniqueConstraints": {},
@@ -164,16 +158,12 @@
       "indexes": {
         "ticketId_idx": {
           "name": "ticketId_idx",
-          "columns": [
-            "ticketId"
-          ],
+          "columns": ["ticketId"],
           "isUnique": false
         },
         "uploadedBy_idx": {
           "name": "uploadedBy_idx",
-          "columns": [
-            "uploadedByUserId"
-          ],
+          "columns": ["uploadedByUserId"],
           "isUnique": false
         }
       },
@@ -181,9 +171,7 @@
       "compositePrimaryKeys": {
         "attachments_id": {
           "name": "attachments_id",
-          "columns": [
-            "id"
-          ]
+          "columns": ["id"]
         }
       },
       "uniqueConstraints": {},
@@ -252,17 +240,13 @@
       "compositePrimaryKeys": {
         "categories_id": {
           "name": "categories_id",
-          "columns": [
-            "id"
-          ]
+          "columns": ["id"]
         }
       },
       "uniqueConstraints": {
         "categories_name_unique": {
           "name": "categories_name_unique",
-          "columns": [
-            "name"
-          ]
+          "columns": ["name"]
         }
       },
       "checkConstraint": {}
@@ -339,23 +323,17 @@
       "indexes": {
         "userId_idx": {
           "name": "userId_idx",
-          "columns": [
-            "userId"
-          ],
+          "columns": ["userId"],
           "isUnique": false
         },
         "ticketId_idx": {
           "name": "ticketId_idx",
-          "columns": [
-            "ticketId"
-          ],
+          "columns": ["ticketId"],
           "isUnique": false
         },
         "isRead_idx": {
           "name": "isRead_idx",
-          "columns": [
-            "isRead"
-          ],
+          "columns": ["isRead"],
           "isUnique": false
         }
       },
@@ -363,9 +341,7 @@
       "compositePrimaryKeys": {
         "notifications_id": {
           "name": "notifications_id",
-          "columns": [
-            "id"
-          ]
+          "columns": ["id"]
         }
       },
       "uniqueConstraints": {},
@@ -432,17 +408,13 @@
       "compositePrimaryKeys": {
         "priorities_id": {
           "name": "priorities_id",
-          "columns": [
-            "id"
-          ]
+          "columns": ["id"]
         }
       },
       "uniqueConstraints": {
         "priorities_name_unique": {
           "name": "priorities_name_unique",
-          "columns": [
-            "name"
-          ]
+          "columns": ["name"]
         }
       },
       "checkConstraint": {}
@@ -507,16 +479,12 @@
       "indexes": {
         "ticketId_idx": {
           "name": "ticketId_idx",
-          "columns": [
-            "ticketId"
-          ],
+          "columns": ["ticketId"],
           "isUnique": false
         },
         "userId_idx": {
           "name": "userId_idx",
-          "columns": [
-            "userId"
-          ],
+          "columns": ["userId"],
           "isUnique": false
         }
       },
@@ -524,9 +492,7 @@
       "compositePrimaryKeys": {
         "ticket_comments_id": {
           "name": "ticket_comments_id",
-          "columns": [
-            "id"
-          ]
+          "columns": ["id"]
         }
       },
       "uniqueConstraints": {},
@@ -603,23 +569,17 @@
       "indexes": {
         "ticketId_idx": {
           "name": "ticketId_idx",
-          "columns": [
-            "ticketId"
-          ],
+          "columns": ["ticketId"],
           "isUnique": false
         },
         "changedBy_idx": {
           "name": "changedBy_idx",
-          "columns": [
-            "changedByUserId"
-          ],
+          "columns": ["changedByUserId"],
           "isUnique": false
         },
         "createdAt_idx": {
           "name": "createdAt_idx",
-          "columns": [
-            "createdAt"
-          ],
+          "columns": ["createdAt"],
           "isUnique": false
         }
       },
@@ -627,9 +587,7 @@
       "compositePrimaryKeys": {
         "ticket_history_id": {
           "name": "ticket_history_id",
-          "columns": [
-            "id"
-          ]
+          "columns": ["id"]
         }
       },
       "uniqueConstraints": {},
@@ -704,17 +662,13 @@
       "compositePrimaryKeys": {
         "ticket_statuses_id": {
           "name": "ticket_statuses_id",
-          "columns": [
-            "id"
-          ]
+          "columns": ["id"]
         }
       },
       "uniqueConstraints": {
         "ticket_statuses_name_unique": {
           "name": "ticket_statuses_name_unique",
-          "columns": [
-            "name"
-          ]
+          "columns": ["name"]
         }
       },
       "checkConstraint": {}
@@ -841,51 +795,37 @@
       "indexes": {
         "ticketNumber_idx": {
           "name": "ticketNumber_idx",
-          "columns": [
-            "ticketNumber"
-          ],
+          "columns": ["ticketNumber"],
           "isUnique": false
         },
         "status_idx": {
           "name": "status_idx",
-          "columns": [
-            "statusId"
-          ],
+          "columns": ["statusId"],
           "isUnique": false
         },
         "category_idx": {
           "name": "category_idx",
-          "columns": [
-            "categoryId"
-          ],
+          "columns": ["categoryId"],
           "isUnique": false
         },
         "priority_idx": {
           "name": "priority_idx",
-          "columns": [
-            "priorityId"
-          ],
+          "columns": ["priorityId"],
           "isUnique": false
         },
         "createdBy_idx": {
           "name": "createdBy_idx",
-          "columns": [
-            "createdByUserId"
-          ],
+          "columns": ["createdByUserId"],
           "isUnique": false
         },
         "assignedTo_idx": {
           "name": "assignedTo_idx",
-          "columns": [
-            "assignedToUserId"
-          ],
+          "columns": ["assignedToUserId"],
           "isUnique": false
         },
         "createdAt_idx": {
           "name": "createdAt_idx",
-          "columns": [
-            "createdAt"
-          ],
+          "columns": ["createdAt"],
           "isUnique": false
         }
       },
@@ -893,17 +833,13 @@
       "compositePrimaryKeys": {
         "tickets_id": {
           "name": "tickets_id",
-          "columns": [
-            "id"
-          ]
+          "columns": ["id"]
         }
       },
       "uniqueConstraints": {
         "tickets_ticketNumber_unique": {
           "name": "tickets_ticketNumber_unique",
-          "columns": [
-            "ticketNumber"
-          ]
+          "columns": ["ticketNumber"]
         }
       },
       "checkConstraint": {}
@@ -998,16 +934,12 @@
       "indexes": {
         "email_idx": {
           "name": "email_idx",
-          "columns": [
-            "email"
-          ],
+          "columns": ["email"],
           "isUnique": false
         },
         "role_idx": {
           "name": "role_idx",
-          "columns": [
-            "role"
-          ],
+          "columns": ["role"],
           "isUnique": false
         }
       },
@@ -1015,23 +947,17 @@
       "compositePrimaryKeys": {
         "users_id": {
           "name": "users_id",
-          "columns": [
-            "id"
-          ]
+          "columns": ["id"]
         }
       },
       "uniqueConstraints": {
         "users_openId_unique": {
           "name": "users_openId_unique",
-          "columns": [
-            "openId"
-          ]
+          "columns": ["openId"]
         },
         "users_email_unique": {
           "name": "users_email_unique",
-          "columns": [
-            "email"
-          ]
+          "columns": ["email"]
         }
       },
       "checkConstraint": {}

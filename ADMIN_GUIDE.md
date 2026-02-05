@@ -29,16 +29,19 @@ Los técnicos acceden al sistema con sus credenciales @servyre.com. Al iniciar s
 La página "Todos los Tickets" es el centro de operaciones para técnicos. Aquí pueden:
 
 **Buscar Tickets**
+
 - Usa la barra de búsqueda para encontrar por título o número de ticket
 - La búsqueda es en tiempo real y filtra mientras escribes
 
 **Filtrar por Estado**
+
 - **Abierto**: Tickets nuevos sin asignar
 - **En Progreso**: Tickets en los que se está trabajando
 - **Resuelto**: Tickets completados
 - **Cerrado**: Tickets archivados
 
 **Filtrar por Prioridad**
+
 - **Crítica**: Requiere atención inmediata
 - **Alta**: Importante, resolver pronto
 - **Media**: Urgencia normal
@@ -49,6 +52,7 @@ La página "Todos los Tickets" es el centro de operaciones para técnicos. Aquí
 **Abrir Detalles del Ticket**
 
 Haz clic en cualquier ticket para ver:
+
 - Información completa del problema
 - Historial de cambios
 - Comentarios del usuario y del equipo
@@ -62,6 +66,7 @@ Haz clic en cualquier ticket para ver:
 3. El usuario será notificado automáticamente
 
 Flujo típico de estados:
+
 ```
 Abierto → En Progreso → Resuelto → Cerrado
 ```
@@ -86,6 +91,7 @@ Los reportes técnicos documentan la solución implementada:
    - Resultados de la prueba
 
 Ejemplo de reporte:
+
 ```
 Problema: Usuario no puede acceder a la red WiFi corporativa
 
@@ -95,7 +101,7 @@ Pasos realizados:
 3. Actualizar drivers de red
 4. Reconfigurarse a la red corporativa
 
-Solución: El problema era causado por drivers desactualizados. 
+Solución: El problema era causado por drivers desactualizados.
 Se actualizaron los drivers y se reconectó a la red.
 
 Resultado: Usuario puede acceder correctamente a la red.
@@ -109,11 +115,13 @@ Hay dos tipos de comentarios:
 - **Comentarios Internos**: Solo visibles para técnicos
 
 Usa comentarios públicos para:
+
 - Pedir más información al usuario
 - Informar sobre el progreso
 - Solicitar confirmación de la solución
 
 Usa comentarios internos para:
+
 - Notas técnicas
 - Coordinación con otros técnicos
 - Problemas identificados
@@ -130,11 +138,11 @@ Usa comentarios internos para:
 **Tiempo de Respuesta Objetivo**
 
 | Prioridad | Respuesta Inicial | Resolución |
-|-----------|------------------|-----------|
-| Crítica | 15 minutos | 2 horas |
-| Alta | 1 hora | 8 horas |
-| Media | 4 horas | 24 horas |
-| Baja | 24 horas | 72 horas |
+| --------- | ----------------- | ---------- |
+| Crítica   | 15 minutos        | 2 horas    |
+| Alta      | 1 hora            | 8 horas    |
+| Media     | 4 horas           | 24 horas   |
+| Baja      | 24 horas          | 72 horas   |
 
 ---
 
@@ -143,6 +151,7 @@ Usa comentarios internos para:
 ### Acceso Administrativo
 
 Solo usuarios con rol "admin" pueden acceder a:
+
 - Dashboard administrativo
 - Generación de reportes
 - Configuración del sistema
@@ -210,12 +219,14 @@ El reporte incluye:
 **Usar Reportes para Análisis**
 
 Los reportes ayudan a:
+
 - Identificar tendencias
 - Evaluar rendimiento del equipo
 - Planificar recursos
 - Comunicar métricas a la gerencia
 
 Ejemplo de análisis:
+
 - Si la tasa de resolución es baja, puede haber falta de personal
 - Si hay muchos tickets críticos sin resolver, necesitas priorizar
 - Si el tiempo promedio de resolución aumenta, investiga causas
@@ -278,6 +289,7 @@ Algunos tickets pueden requerir escalación:
 Los usuarios pueden adjuntar archivos (fotos, documentos, etc.):
 
 **Tipos de Archivo Soportados**
+
 - Imágenes: JPG, PNG, GIF, WebP
 - Documentos: PDF, DOC, DOCX, XLS, XLSX
 - Archivos: ZIP, RAR, 7Z
@@ -298,6 +310,7 @@ En la página de detalles del ticket, puedes descargar cualquier archivo adjunto
 **Tickets por Estado**
 
 El gráfico circular muestra la distribución:
+
 - **Abierto (Azul)**: Nuevos tickets sin asignar
 - **En Progreso (Púrpura)**: Tickets siendo resueltos
 - **Resuelto (Verde)**: Tickets completados
@@ -308,6 +321,7 @@ Un alto número de tickets "Abiertos" indica necesidad de más personal.
 **Tickets por Prioridad**
 
 El gráfico de barras muestra:
+
 - **Crítica (Rojo)**: Requiere atención inmediata
 - **Alta (Naranja)**: Importante
 - **Media (Amarillo)**: Urgencia normal
@@ -327,13 +341,13 @@ Un alto número de tickets críticos indica problemas sistémicos.
 
 **Acciones Basadas en Análisis**
 
-| Observación | Acción |
-|-------------|--------|
-| Aumento de tickets | Aumentar personal o automatizar |
-| Muchos críticos | Investigar causa raíz |
-| Tiempo de resolución alto | Capacitar equipo o mejorar procesos |
-| Un técnico sobrecargado | Redistribuir carga de trabajo |
-| Categoría con muchos tickets | Crear documentación o automatizar |
+| Observación                  | Acción                              |
+| ---------------------------- | ----------------------------------- |
+| Aumento de tickets           | Aumentar personal o automatizar     |
+| Muchos críticos              | Investigar causa raíz               |
+| Tiempo de resolución alto    | Capacitar equipo o mejorar procesos |
+| Un técnico sobrecargado      | Redistribuir carga de trabajo       |
+| Categoría con muchos tickets | Crear documentación o automatizar   |
 
 ---
 
@@ -352,6 +366,7 @@ Un alto número de tickets críticos indica problemas sistémicos.
 Las categorías ayudan a organizar tickets:
 
 **Categorías Predefinidas**
+
 - Hardware: Problemas con computadoras, periféricos
 - Software: Problemas con aplicaciones
 - Red: Problemas de conectividad
@@ -465,21 +480,25 @@ Los estados predefinidos son:
 ## Troubleshooting para Administradores
 
 **Problema: Tickets no se asignan correctamente**
+
 - Verifica que los técnicos tienen rol "technician"
 - Comprueba que los técnicos están activos en el sistema
 - Reinicia el servidor si es necesario
 
 **Problema: Notificaciones no se envían**
+
 - Verifica configuración de notificaciones
 - Comprueba que los usuarios tienen email válido
 - Revisa logs del sistema
 
 **Problema: Reportes PDF no se generan**
+
 - Verifica que hay datos en la base de datos
 - Comprueba permisos de archivo
 - Reinicia el servidor
 
 **Problema: Dashboard muestra datos incorrectos**
+
 - Limpia caché del navegador
 - Recarga la página
 - Verifica integridad de datos en base de datos

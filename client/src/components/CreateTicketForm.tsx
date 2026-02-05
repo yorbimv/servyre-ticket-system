@@ -61,7 +61,7 @@ export default function CreateTicketForm({ onSuccess }: CreateTicketFormProps) {
         <Input
           placeholder="Describe brevemente tu problema"
           value={title}
-          onChange={(e) => setTitle(e.target.value)}
+          onChange={e => setTitle(e.target.value)}
           minLength={5}
           required
         />
@@ -72,7 +72,7 @@ export default function CreateTicketForm({ onSuccess }: CreateTicketFormProps) {
         <Textarea
           placeholder="Proporciona detalles completos de tu problema"
           value={description}
-          onChange={(e) => setDescription(e.target.value)}
+          onChange={e => setDescription(e.target.value)}
           minLength={10}
           rows={4}
           required
@@ -87,7 +87,7 @@ export default function CreateTicketForm({ onSuccess }: CreateTicketFormProps) {
               <SelectValue placeholder="Selecciona una categoría" />
             </SelectTrigger>
             <SelectContent>
-              {categories?.map((cat) => (
+              {categories?.map(cat => (
                 <SelectItem key={cat.id} value={cat.id.toString()}>
                   {cat.name}
                 </SelectItem>
@@ -103,7 +103,7 @@ export default function CreateTicketForm({ onSuccess }: CreateTicketFormProps) {
               <SelectValue placeholder="Selecciona prioridad" />
             </SelectTrigger>
             <SelectContent>
-              {priorities?.map((pri) => (
+              {priorities?.map(pri => (
                 <SelectItem key={pri.id} value={pri.id.toString()}>
                   {pri.displayName}
                 </SelectItem>
@@ -115,7 +115,9 @@ export default function CreateTicketForm({ onSuccess }: CreateTicketFormProps) {
 
       <div className="flex gap-2 justify-end pt-4">
         <Button type="submit" disabled={createTicket.isPending}>
-          {createTicket.isPending && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+          {createTicket.isPending && (
+            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+          )}
           Crear Ticket
         </Button>
       </div>

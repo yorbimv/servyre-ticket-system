@@ -1,7 +1,13 @@
 import { useState } from "react";
 import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Loader2, Plus, AlertCircle } from "lucide-react";
 import { useLocation } from "wouter";
@@ -48,7 +54,9 @@ export default function MyTickets() {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold text-gray-900">Mis Tickets</h1>
-            <p className="text-gray-600 mt-1">Visualiza y gestiona tus solicitudes de soporte</p>
+            <p className="text-gray-600 mt-1">
+              Visualiza y gestiona tus solicitudes de soporte
+            </p>
           </div>
           <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
             <DialogTrigger asChild>
@@ -81,7 +89,10 @@ export default function MyTickets() {
               <p className="text-gray-600 text-center">
                 No tienes tickets aún. Crea uno para solicitar soporte.
               </p>
-              <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
+              <Dialog
+                open={showCreateDialog}
+                onOpenChange={setShowCreateDialog}
+              >
                 <DialogTrigger asChild>
                   <Button className="mt-4 gap-2">
                     <Plus className="w-4 h-4" />
@@ -95,14 +106,16 @@ export default function MyTickets() {
                       Describe tu problema o solicitud de soporte
                     </DialogDescription>
                   </DialogHeader>
-                  <CreateTicketForm onSuccess={() => setShowCreateDialog(false)} />
+                  <CreateTicketForm
+                    onSuccess={() => setShowCreateDialog(false)}
+                  />
                 </DialogContent>
               </Dialog>
             </CardContent>
           </Card>
         ) : (
           <div className="grid gap-4">
-            {tickets.map((ticket) => (
+            {tickets.map(ticket => (
               <Card
                 key={ticket.id}
                 className="cursor-pointer hover:shadow-md transition-shadow"
@@ -124,18 +137,38 @@ export default function MyTickets() {
                       </p>
                       <div className="flex items-center gap-2 flex-wrap">
                         <Badge className={getStatusColor(ticket.statusId)}>
-                          Estado: {ticket.statusId === 1 ? "Abierto" : ticket.statusId === 2 ? "En Progreso" : ticket.statusId === 3 ? "Resuelto" : "Cerrado"}
+                          Estado:{" "}
+                          {ticket.statusId === 1
+                            ? "Abierto"
+                            : ticket.statusId === 2
+                              ? "En Progreso"
+                              : ticket.statusId === 3
+                                ? "Resuelto"
+                                : "Cerrado"}
                         </Badge>
                         <Badge className={getPriorityColor(ticket.priorityId)}>
-                          Prioridad: {ticket.priorityId === 1 ? "Crítica" : ticket.priorityId === 2 ? "Alta" : ticket.priorityId === 3 ? "Media" : "Baja"}
+                          Prioridad:{" "}
+                          {ticket.priorityId === 1
+                            ? "Crítica"
+                            : ticket.priorityId === 2
+                              ? "Alta"
+                              : ticket.priorityId === 3
+                                ? "Media"
+                                : "Baja"}
                         </Badge>
                       </div>
                     </div>
                     <div className="text-right text-sm text-gray-500">
-                      <p>Creado: {new Date(ticket.createdAt).toLocaleDateString("es-ES")}</p>
+                      <p>
+                        Creado:{" "}
+                        {new Date(ticket.createdAt).toLocaleDateString("es-ES")}
+                      </p>
                       {ticket.resolvedAt && (
                         <p className="text-green-600">
-                          Resuelto: {new Date(ticket.resolvedAt).toLocaleDateString("es-ES")}
+                          Resuelto:{" "}
+                          {new Date(ticket.resolvedAt).toLocaleDateString(
+                            "es-ES"
+                          )}
                         </p>
                       )}
                     </div>

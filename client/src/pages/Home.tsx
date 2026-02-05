@@ -1,6 +1,12 @@
 import { useAuth } from "@/_core/hooks/useAuth";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Loader2, Ticket, BarChart3, FileText, Bell } from "lucide-react";
 import { getLoginUrl } from "@/const";
 import { useLocation } from "wouter";
@@ -26,7 +32,9 @@ export default function Home() {
         <div className="max-w-md w-full text-center space-y-6">
           <div className="space-y-2">
             <h1 className="text-4xl font-bold text-gray-900">Servyre IT</h1>
-            <p className="text-lg text-gray-600">Sistema de Gestión de Tickets</p>
+            <p className="text-lg text-gray-600">
+              Sistema de Gestión de Tickets
+            </p>
           </div>
 
           <Card className="border-0 shadow-lg">
@@ -37,8 +45,8 @@ export default function Home() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <Button 
-                onClick={() => window.location.href = getLoginUrl()} 
+              <Button
+                onClick={() => (window.location.href = getLoginUrl())}
                 className="w-full h-10 text-base"
               >
                 Iniciar Sesión

@@ -14,6 +14,7 @@ Comienza a usar el sistema de tickets en 5 minutos.
 ### 2. Entender la Interfaz
 
 **Menú Lateral (Izquierda)**
+
 - **Inicio**: Página principal
 - **Mis Tickets**: Tus tickets creados
 - **Todos los Tickets**: Todos los tickets (solo técnicos)
@@ -21,6 +22,7 @@ Comienza a usar el sistema de tickets en 5 minutos.
 - **Administración**: Configuración (solo admins)
 
 **Barra Superior**
+
 - **Icono de Campana**: Notificaciones
 - **Avatar**: Menú de usuario
 
@@ -34,8 +36,8 @@ Comienza a usar el sistema de tickets en 5 minutos.
 
 ```
 Título: "No puedo acceder a la red WiFi"
-Descripción: "Cuando intento conectarme a la red WiFi corporativa, 
-me pide contraseña pero no acepta la mía. He intentado varias veces 
+Descripción: "Cuando intento conectarme a la red WiFi corporativa,
+me pide contraseña pero no acepta la mía. He intentado varias veces
 pero sigue sin funcionar."
 Categoría: "Red"
 Prioridad: "Alta"
@@ -57,6 +59,7 @@ Prioridad: "Alta"
 ### Comunicarte con el Equipo
 
 En la página del ticket puedes:
+
 - **Agregar comentarios**: Escribe preguntas o proporciona más información
 - **Ver comentarios**: Lee respuestas del equipo técnico
 - **Recibir notificaciones**: Te avisaremos cuando haya cambios
@@ -89,6 +92,7 @@ En la página del ticket puedes:
 5. El usuario será notificado automáticamente
 
 **Ejemplo de Reporte Técnico:**
+
 ```
 Problema identificado: Drivers de red desactualizados
 
@@ -122,25 +126,27 @@ Resultado: Usuario puede acceder correctamente a la red WiFi corporativa.
 
 ## ⚡ Atajos Útiles
 
-| Acción | Atajo |
-|--------|-------|
-| Ir a Mis Tickets | Menú lateral → Mis Tickets |
-| Crear Ticket | Mis Tickets → Crear Nuevo Ticket |
-| Ver Notificaciones | Icono de campana (arriba derecha) |
-| Cerrar Sesión | Avatar → Cerrar Sesión |
-| Buscar Ticket | Todos los Tickets → Barra de búsqueda |
+| Acción             | Atajo                                 |
+| ------------------ | ------------------------------------- |
+| Ir a Mis Tickets   | Menú lateral → Mis Tickets            |
+| Crear Ticket       | Mis Tickets → Crear Nuevo Ticket      |
+| Ver Notificaciones | Icono de campana (arriba derecha)     |
+| Cerrar Sesión      | Avatar → Cerrar Sesión                |
+| Buscar Ticket      | Todos los Tickets → Barra de búsqueda |
 
 ## 🎯 Casos de Uso Comunes
 
 ### Caso 1: Usuario no puede acceder a aplicación
 
 **Usuario Final:**
+
 1. Crea ticket con título "No puedo acceder a [nombre aplicación]"
 2. Describe qué error ves
 3. Adjunta captura de pantalla si es posible
 4. Espera respuesta del equipo técnico
 
 **Técnico IT:**
+
 1. Lee el ticket y la captura de pantalla
 2. Verifica permisos del usuario
 3. Reinicia la aplicación si es necesario
@@ -150,11 +156,13 @@ Resultado: Usuario puede acceder correctamente a la red WiFi corporativa.
 ### Caso 2: Problema de hardware
 
 **Usuario Final:**
+
 1. Crea ticket con "Problema con [dispositivo]"
 2. Describe síntomas (no enciende, no funciona, etc.)
 3. Indica si es urgente
 
 **Técnico IT:**
+
 1. Asigna a técnico de hardware
 2. Coordina con usuario para revisar dispositivo
 3. Repara o reemplaza si es necesario
@@ -163,11 +171,13 @@ Resultado: Usuario puede acceder correctamente a la red WiFi corporativa.
 ### Caso 3: Solicitud de acceso
 
 **Usuario Final:**
+
 1. Crea ticket con "Solicito acceso a [recurso]"
 2. Explica por qué lo necesitas
 3. Indica nivel de urgencia
 
 **Técnico IT:**
+
 1. Verifica con gerente si es autorizado
 2. Configura acceso en sistema
 3. Confirma al usuario que tiene acceso
@@ -177,6 +187,7 @@ Resultado: Usuario puede acceder correctamente a la red WiFi corporativa.
 
 **P: ¿Cuánto tiempo tarda en responder el equipo?**
 R: Depende de la prioridad:
+
 - Crítica: 15 minutos
 - Alta: 1 hora
 - Media: 4 horas
@@ -204,6 +215,7 @@ R: No, todos los tickets se guardan permanentemente en el historial.
 4. Llama al equipo de soporte IT
 
 **Información útil para reportar problemas:**
+
 - Tu navegador y versión
 - Sistema operativo
 - Pasos que realizaste

@@ -1,7 +1,13 @@
 import { useState } from "react";
 import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import {
   Select,
   SelectContent,
@@ -81,7 +87,7 @@ export default function Admin() {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    {months.map((month) => (
+                    {months.map(month => (
                       <SelectItem key={month.value} value={month.value}>
                         {month.label}
                       </SelectItem>
@@ -97,7 +103,7 @@ export default function Admin() {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    {years.map((year) => (
+                    {years.map(year => (
                       <SelectItem key={year} value={year.toString()}>
                         {year}
                       </SelectItem>
@@ -112,7 +118,9 @@ export default function Admin() {
                   disabled={generateReport.isPending}
                   className="w-full gap-2"
                 >
-                  {generateReport.isPending && <Loader2 className="w-4 h-4 animate-spin" />}
+                  {generateReport.isPending && (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  )}
                   <Download className="w-4 h-4" />
                   Generar Reporte
                 </Button>
@@ -121,8 +129,9 @@ export default function Admin() {
 
             <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 text-sm text-blue-700">
               <p>
-                El reporte incluirá: total de tickets, tickets resueltos, distribución por prioridad,
-                estado, tiempo promedio de resolución y más estadísticas relevantes.
+                El reporte incluirá: total de tickets, tickets resueltos,
+                distribución por prioridad, estado, tiempo promedio de
+                resolución y más estadísticas relevantes.
               </p>
             </div>
           </CardContent>
@@ -139,7 +148,9 @@ export default function Admin() {
           <CardContent className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium mb-2">Nombre de la Aplicación</label>
+                <label className="block text-sm font-medium mb-2">
+                  Nombre de la Aplicación
+                </label>
                 <input
                   type="text"
                   defaultValue="Servyre IT Ticket System"
@@ -149,7 +160,9 @@ export default function Admin() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-2">Versión</label>
+                <label className="block text-sm font-medium mb-2">
+                  Versión
+                </label>
                 <input
                   type="text"
                   defaultValue="1.0.0"
@@ -160,7 +173,9 @@ export default function Admin() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-2">Descripción</label>
+              <label className="block text-sm font-medium mb-2">
+                Descripción
+              </label>
               <textarea
                 defaultValue="Sistema de gestión de tickets de soporte IT para Servyre"
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg"
@@ -180,14 +195,16 @@ export default function Admin() {
             <div className="border-l-4 border-blue-500 pl-4 py-2">
               <h4 className="font-medium text-sm">Creación de Tickets</h4>
               <p className="text-sm text-gray-600">
-                Los usuarios finales pueden crear tickets desde la sección "Mis Tickets"
+                Los usuarios finales pueden crear tickets desde la sección "Mis
+                Tickets"
               </p>
             </div>
 
             <div className="border-l-4 border-green-500 pl-4 py-2">
               <h4 className="font-medium text-sm">Gestión de Tickets</h4>
               <p className="text-sm text-gray-600">
-                Los técnicos pueden ver, asignar y actualizar todos los tickets desde "Todos los Tickets"
+                Los técnicos pueden ver, asignar y actualizar todos los tickets
+                desde "Todos los Tickets"
               </p>
             </div>
 
@@ -201,7 +218,8 @@ export default function Admin() {
             <div className="border-l-4 border-orange-500 pl-4 py-2">
               <h4 className="font-medium text-sm">Reportes</h4>
               <p className="text-sm text-gray-600">
-                Genera reportes PDF mensuales con estadísticas completas del departamento
+                Genera reportes PDF mensuales con estadísticas completas del
+                departamento
               </p>
             </div>
           </CardContent>

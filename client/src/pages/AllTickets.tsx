@@ -1,7 +1,13 @@
 import { useState } from "react";
 import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import {
@@ -22,16 +28,20 @@ export default function AllTickets() {
   const [filterStatus, setFilterStatus] = useState("all");
   const [filterPriority, setFilterPriority] = useState("all");
 
-  const filteredTickets = tickets?.filter((ticket) => {
-    const matchesSearch =
-      ticket.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      ticket.ticketNumber.toLowerCase().includes(searchTerm.toLowerCase());
+  const filteredTickets =
+    tickets?.filter(ticket => {
+      const matchesSearch =
+        ticket.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        ticket.ticketNumber.toLowerCase().includes(searchTerm.toLowerCase());
 
-    const matchesStatus = filterStatus === "all" || ticket.statusId.toString() === filterStatus;
-    const matchesPriority = filterPriority === "all" || ticket.priorityId.toString() === filterPriority;
+      const matchesStatus =
+        filterStatus === "all" || ticket.statusId.toString() === filterStatus;
+      const matchesPriority =
+        filterPriority === "all" ||
+        ticket.priorityId.toString() === filterPriority;
 
-    return matchesSearch && matchesStatus && matchesPriority;
-  }) || [];
+      return matchesSearch && matchesStatus && matchesPriority;
+    }) || [];
 
   const getPriorityColor = (priorityId: number) => {
     const priorityMap: Record<number, string> = {
@@ -58,8 +68,12 @@ export default function AllTickets() {
       <div className="p-6 max-w-7xl mx-auto space-y-6">
         {/* Header */}
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Gestión de Tickets</h1>
-          <p className="text-gray-600 mt-1">Administra y resuelve todos los tickets del sistema</p>
+          <h1 className="text-3xl font-bold text-gray-900">
+            Gestión de Tickets
+          </h1>
+          <p className="text-gray-600 mt-1">
+            Administra y resuelve todos los tickets del sistema
+          </p>
         </div>
 
         {/* Filters */}
@@ -71,7 +85,7 @@ export default function AllTickets() {
                 <Input
                   placeholder="Buscar por título o número..."
                   value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
+                  onChange={e => setSearchTerm(e.target.value)}
                   className="pl-10"
                 />
               </div>
@@ -120,7 +134,7 @@ export default function AllTickets() {
           </Card>
         ) : (
           <div className="grid gap-4">
-            {filteredTickets.map((ticket) => (
+            {filteredTickets.map(ticket => (
               <Card
                 key={ticket.id}
                 className="cursor-pointer hover:shadow-md transition-shadow"
@@ -142,15 +156,30 @@ export default function AllTickets() {
                       </p>
                       <div className="flex items-center gap-2 flex-wrap">
                         <Badge className={getStatusColor(ticket.statusId)}>
-                          {ticket.statusId === 1 ? "Abierto" : ticket.statusId === 2 ? "En Progreso" : ticket.statusId === 3 ? "Resuelto" : "Cerrado"}
+                          {ticket.statusId === 1
+                            ? "Abierto"
+                            : ticket.statusId === 2
+                              ? "En Progreso"
+                              : ticket.statusId === 3
+                                ? "Resuelto"
+                                : "Cerrado"}
                         </Badge>
                         <Badge className={getPriorityColor(ticket.priorityId)}>
-                          {ticket.priorityId === 1 ? "Crítica" : ticket.priorityId === 2 ? "Alta" : ticket.priorityId === 3 ? "Media" : "Baja"}
+                          {ticket.priorityId === 1
+                            ? "Crítica"
+                            : ticket.priorityId === 2
+                              ? "Alta"
+                              : ticket.priorityId === 3
+                                ? "Media"
+                                : "Baja"}
                         </Badge>
                       </div>
                     </div>
                     <div className="text-right text-sm text-gray-500 min-w-fit">
-                      <p>Creado: {new Date(ticket.createdAt).toLocaleDateString("es-ES")}</p>
+                      <p>
+                        Creado:{" "}
+                        {new Date(ticket.createdAt).toLocaleDateString("es-ES")}
+                      </p>
                       {ticket.assignedToUserId && (
                         <p className="text-blue-600">Asignado</p>
                       )}
