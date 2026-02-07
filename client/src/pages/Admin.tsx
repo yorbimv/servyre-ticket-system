@@ -15,9 +15,30 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Loader2, Download, FileText } from "lucide-react";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@/components/ui/tabs";
+import {
+  Loader2,
+  Download,
+  FileText,
+  Settings,
+  UserCog,
+  Tags,
+  HelpCircle,
+  ShieldAlert,
+  Building2
+} from "lucide-react";
 import AppLayout from "@/components/AppLayout";
 import { toast } from "sonner";
+import { UserManagement } from "@/components/admin/UserManagement";
+import { CategoryManagement } from "@/components/admin/CategoryManagement";
+import { PriorityManagement } from "@/components/admin/PriorityManagement";
+import DepartmentManagement from "@/components/admin/DepartmentManagement";
+import UserTicketList from "@/components/admin/UserTicketList";
 
 const months = [
   { value: "1", label: "Enero" },
@@ -50,7 +71,6 @@ export default function Admin() {
       });
 
       if (result.success) {
-        // En una aplicación real, aquí descargarías el PDF desde el servidor
         toast.success(`Reporte generado: ${result.fileName}`);
       }
     } catch (error) {
@@ -60,170 +80,209 @@ export default function Admin() {
 
   return (
     <AppLayout>
-      <div className="p-6 max-w-4xl mx-auto space-y-6">
+      <div className="p-6 max-w-6xl mx-auto space-y-6">
         {/* Header */}
         <div>
           <h1 className="text-3xl font-bold text-gray-900">Administración</h1>
-          <p className="text-gray-600 mt-1">Gestión y reportería del sistema</p>
+          <p className="text-gray-600 mt-1">Gestión avanzada del sistema y analítica</p>
         </div>
 
-        {/* Reports Section */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <FileText className="w-5 h-5" />
-              Generar Reportes Mensuales
-            </CardTitle>
-            <CardDescription>
-              Descarga reportes PDF con estadísticas y métricas de tickets
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div>
-                <label className="block text-sm font-medium mb-2">Mes</label>
-                <Select value={selectedMonth} onValueChange={setSelectedMonth}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {months.map(month => (
-                      <SelectItem key={month.value} value={month.value}>
-                        {month.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
+        <Tabs defaultValue="reports" className="space-y-6">
+          <TabsList className="bg-gray-100/80 p-1 border">
+            <TabsTrigger value="reports" className="gap-2">
+              <FileText className="w-4 h-4" />
+              Reportes
+            </TabsTrigger>
+            <TabsTrigger value="users" className="gap-2">
+              <UserCog className="w-4 h-4" />
+              Usuarios
+            </TabsTrigger>
+            <TabsTrigger value="categories" className="gap-2">
+              <Tags className="w-4 h-4" />
+              Categorías
+            </TabsTrigger>
+            <TabsTrigger value="priorities" className="gap-2">
+              <ShieldAlert className="w-4 h-4" />
+              Prioridades
+            </TabsTrigger>
+            <TabsTrigger value="departments" className="gap-2">
+              <Building2 className="w-4 h-4" />
+              Departamentos
+            </TabsTrigger>
+            <TabsTrigger value="ticket-users" className="gap-2">
+              <UserCog className="w-4 h-4" />
+              Usuarios de Tickets
+            </TabsTrigger>
+            <TabsTrigger value="settings" className="gap-2">
+              <Settings className="w-4 h-4" />
+              Sistema
+            </TabsTrigger>
+          </TabsList>
 
-              <div>
-                <label className="block text-sm font-medium mb-2">Año</label>
-                <Select value={selectedYear} onValueChange={setSelectedYear}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {years.map(year => (
-                      <SelectItem key={year} value={year.toString()}>
-                        {year}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
+          <TabsContent value="reports" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <FileText className="w-5 h-5text-blue-500" />
+                  Generar Reportes Mensuales
+                </CardTitle>
+                <CardDescription>
+                  Descarga reportes PDF con estadísticas y métricas de tickets
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Mes</label>
+                    <Select value={selectedMonth} onValueChange={setSelectedMonth}>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {months.map(month => (
+                          <SelectItem key={month.value} value={month.value}>
+                            {month.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
 
-              <div className="flex items-end">
-                <Button
-                  onClick={handleGenerateReport}
-                  disabled={generateReport.isPending}
-                  className="w-full gap-2"
-                >
-                  {generateReport.isPending && (
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                  )}
-                  <Download className="w-4 h-4" />
-                  Generar Reporte
-                </Button>
-              </div>
-            </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Año</label>
+                    <Select value={selectedYear} onValueChange={setSelectedYear}>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {years.map(year => (
+                          <SelectItem key={year} value={year.toString()}>
+                            {year}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
 
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 text-sm text-blue-700">
-              <p>
-                El reporte incluirá: total de tickets, tickets resueltos,
-                distribución por prioridad, estado, tiempo promedio de
-                resolución y más estadísticas relevantes.
-              </p>
-            </div>
-          </CardContent>
-        </Card>
+                  <div className="flex items-end">
+                    <Button
+                      onClick={handleGenerateReport}
+                      disabled={generateReport.isPending}
+                      className="w-full gap-2"
+                    >
+                      {generateReport.isPending && (
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                      )}
+                      <Download className="w-4 h-4" />
+                      Generar Reporte
+                    </Button>
+                  </div>
+                </div>
 
-        {/* System Settings */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Configuración del Sistema</CardTitle>
-            <CardDescription>
-              Ajustes generales de la aplicación
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium mb-2">
-                  Nombre de la Aplicación
-                </label>
-                <input
-                  type="text"
-                  defaultValue="Servyre IT Ticket System"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg"
-                  disabled
-                />
-              </div>
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 text-sm text-blue-700">
+                  <p>
+                    El reporte incluirá: total de tickets, tickets resueltos,
+                    distribución por prioridad, estado, tiempo promedio de
+                    resolución y más estadísticas relevantes.
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
 
-              <div>
-                <label className="block text-sm font-medium mb-2">
-                  Versión
-                </label>
-                <input
-                  type="text"
-                  defaultValue="1.0.0"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg"
-                  disabled
-                />
-              </div>
-            </div>
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <HelpCircle className="w-5 h-5 text-purple-500" />
+                  Ayuda y Documentación
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="border border-gray-100 rounded-lg p-4 hover:border-blue-200 transition-colors">
+                  <h4 className="font-semibold text-sm mb-1">Roles de Usuario</h4>
+                  <p className="text-sm text-gray-500">
+                    Cambia entre Usuario (crear tickets), Técnico (gestionar tickets) o Admin.
+                  </p>
+                </div>
+                <div className="border border-gray-100 rounded-lg p-4 hover:border-green-200 transition-colors">
+                  <h4 className="font-semibold text-sm mb-1">Categorías</h4>
+                  <p className="text-sm text-gray-500">
+                    Define las áreas problemáticas para que los usuarios clasifiquen sus peticiones.
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
 
-            <div>
-              <label className="block text-sm font-medium mb-2">
-                Descripción
-              </label>
-              <textarea
-                defaultValue="Sistema de gestión de tickets de soporte IT para Servyre"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg"
-                rows={3}
-                disabled
-              />
-            </div>
-          </CardContent>
-        </Card>
+          <TabsContent value="users">
+            <UserManagement />
+          </TabsContent>
 
-        {/* Help Section */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Ayuda y Documentación</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            <div className="border-l-4 border-blue-500 pl-4 py-2">
-              <h4 className="font-medium text-sm">Creación de Tickets</h4>
-              <p className="text-sm text-gray-600">
-                Los usuarios finales pueden crear tickets desde la sección "Mis
-                Tickets"
-              </p>
-            </div>
+          <TabsContent value="categories">
+            <CategoryManagement />
+          </TabsContent>
 
-            <div className="border-l-4 border-green-500 pl-4 py-2">
-              <h4 className="font-medium text-sm">Gestión de Tickets</h4>
-              <p className="text-sm text-gray-600">
-                Los técnicos pueden ver, asignar y actualizar todos los tickets
-                desde "Todos los Tickets"
-              </p>
-            </div>
+          <TabsContent value="priorities">
+            <PriorityManagement />
+          </TabsContent>
 
-            <div className="border-l-4 border-purple-500 pl-4 py-2">
-              <h4 className="font-medium text-sm">Dashboard</h4>
-              <p className="text-sm text-gray-600">
-                Visualiza métricas y estadísticas en tiempo real en el Dashboard
-              </p>
-            </div>
+          <TabsContent value="departments">
+            <DepartmentManagement />
+          </TabsContent>
 
-            <div className="border-l-4 border-orange-500 pl-4 py-2">
-              <h4 className="font-medium text-sm">Reportes</h4>
-              <p className="text-sm text-gray-600">
-                Genera reportes PDF mensuales con estadísticas completas del
-                departamento
-              </p>
-            </div>
-          </CardContent>
-        </Card>
+          <TabsContent value="ticket-users" className="space-y-6">
+            <UserTicketList />
+          </TabsContent>
+
+          <TabsContent value="settings" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Configuración del Sistema</CardTitle>
+                <CardDescription>
+                  Ajustes generales de la aplicación
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium mb-2">
+                      Nombre de la Aplicación
+                    </label>
+                    <input
+                      type="text"
+                      defaultValue="Servyre IT Ticket System"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                      disabled
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium mb-2">
+                      Versión
+                    </label>
+                    <input
+                      type="text"
+                      defaultValue="1.0.0"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                      disabled
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium mb-2">
+                    Descripción
+                  </label>
+                  <textarea
+                    defaultValue="Sistema de gestión de tickets de soporte IT para Servyre"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                    rows={3}
+                    disabled
+                  />
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
       </div>
     </AppLayout>
   );

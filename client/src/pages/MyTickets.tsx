@@ -2,14 +2,15 @@ import { useState } from "react";
 import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, Plus, AlertCircle } from "lucide-react";
+import { Loader2, Plus, AlertCircle, MessageSquare } from "lucide-react";
 import { useLocation } from "wouter";
 import AppLayout from "@/components/AppLayout";
 import {
@@ -114,68 +115,75 @@ export default function MyTickets() {
             </CardContent>
           </Card>
         ) : (
-          <div className="grid gap-4">
-            {tickets.map(ticket => (
-              <Card
-                key={ticket.id}
-                className="cursor-pointer hover:shadow-md transition-shadow"
-                onClick={() => navigate(`/tickets/${ticket.id}`)}
-              >
-                <CardContent className="p-6">
-                  <div className="flex items-start justify-between gap-4">
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-3 mb-2">
-                        <h3 className="text-lg font-semibold text-gray-900 truncate">
-                          {ticket.title}
-                        </h3>
-                        <Badge variant="outline" className="text-xs">
-                          {ticket.ticketNumber}
-                        </Badge>
+          <div className="bg-white rounded-lg border shadow-sm overflow-hidden">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="w-[120px]">Folio</TableHead>
+                  <TableHead>Título</TableHead>
+                  <TableHead>Estado</TableHead>
+                  <TableHead>Prioridad</TableHead>
+                  <TableHead className="text-center">Comentarios</TableHead>
+                  <TableHead className="text-right">Fecha</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {tickets.map(ticket => (
+                  <TableRow
+                    key={ticket.id}
+                    className="cursor-pointer hover:bg-gray-50 transition-colors"
+                    onClick={() => navigate(`/tickets/${ticket.id}`)}
+                  >
+                    <TableCell className="font-mono font-medium text-blue-600">
+                      {ticket.folio}
+                    </TableCell>
+                    <TableCell>
+                      <div className="max-w-[300px] truncate font-medium">
+                        {ticket.title}
                       </div>
-                      <p className="text-gray-600 text-sm line-clamp-2 mb-3">
-                        {ticket.description}
-                      </p>
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <Badge className={getStatusColor(ticket.statusId)}>
-                          Estado:{" "}
-                          {ticket.statusId === 1
-                            ? "Abierto"
-                            : ticket.statusId === 2
-                              ? "En Progreso"
-                              : ticket.statusId === 3
-                                ? "Resuelto"
-                                : "Cerrado"}
-                        </Badge>
-                        <Badge className={getPriorityColor(ticket.priorityId)}>
-                          Prioridad:{" "}
-                          {ticket.priorityId === 1
-                            ? "Crítica"
-                            : ticket.priorityId === 2
-                              ? "Alta"
-                              : ticket.priorityId === 3
-                                ? "Media"
-                                : "Baja"}
-                        </Badge>
+                      <div className="text-xs text-gray-500 truncate">
+                        {ticket.description.substring(0, 50)}...
                       </div>
-                    </div>
-                    <div className="text-right text-sm text-gray-500">
-                      <p>
-                        Creado:{" "}
-                        {new Date(ticket.createdAt).toLocaleDateString("es-ES")}
-                      </p>
-                      {ticket.resolvedAt && (
-                        <p className="text-green-600">
-                          Resuelto:{" "}
-                          {new Date(ticket.resolvedAt).toLocaleDateString(
-                            "es-ES"
-                          )}
-                        </p>
+                    </TableCell>
+                    <TableCell>
+                      <Badge className={getStatusColor(ticket.statusId)}>
+                        {ticket.statusId === 1
+                          ? "Abierto"
+                          : ticket.statusId === 2
+                            ? "En Progreso"
+                            : ticket.statusId === 3
+                              ? "Resuelto"
+                              : "Cerrado"}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>
+                      <Badge className={getPriorityColor(ticket.priorityId)}>
+                        {ticket.priorityId === 1
+                          ? "Crítica"
+                          : ticket.priorityId === 2
+                            ? "Alta"
+                            : ticket.priorityId === 3
+                              ? "Media"
+                              : "Baja"}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="text-center">
+                      {ticket.commentCount > 0 ? (
+                        <div className="flex items-center justify-center gap-1 text-gray-500">
+                          <MessageSquare className="w-4 h-4" />
+                          <span className="text-xs">{ticket.commentCount}</span>
+                        </div>
+                      ) : (
+                        <span className="text-gray-300">-</span>
                       )}
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
+                    </TableCell>
+                    <TableCell className="text-right text-xs text-gray-500 whitespace-nowrap">
+                      {new Date(ticket.createdAt).toLocaleDateString("es-ES")}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
           </div>
         )}
       </div>

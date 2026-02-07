@@ -6,6 +6,14 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Loader2, Ticket, CheckCircle, Clock, AlertCircle } from "lucide-react";
 import AppLayout from "@/components/AppLayout";
@@ -32,44 +40,44 @@ export default function Dashboard() {
   // Preparar datos para gráficos
   const ticketsByStatus = allTickets
     ? [
-        {
-          name: "Abiertos",
-          value: allTickets.filter(t => t.statusId === 1).length,
-        },
-        {
-          name: "En Progreso",
-          value: allTickets.filter(t => t.statusId === 2).length,
-        },
-        {
-          name: "Resueltos",
-          value: allTickets.filter(t => t.statusId === 3).length,
-        },
-        {
-          name: "Cerrados",
-          value: allTickets.filter(t => t.statusId === 4).length,
-        },
-      ]
+      {
+        name: "Abiertos",
+        value: allTickets.filter(t => t.statusId === 1).length,
+      },
+      {
+        name: "En Progreso",
+        value: allTickets.filter(t => t.statusId === 2).length,
+      },
+      {
+        name: "Resueltos",
+        value: allTickets.filter(t => t.statusId === 3).length,
+      },
+      {
+        name: "Cerrados",
+        value: allTickets.filter(t => t.statusId === 4).length,
+      },
+    ]
     : [];
 
   const ticketsByPriority = allTickets
     ? [
-        {
-          name: "Crítica",
-          value: allTickets.filter(t => t.priorityId === 1).length,
-        },
-        {
-          name: "Alta",
-          value: allTickets.filter(t => t.priorityId === 2).length,
-        },
-        {
-          name: "Media",
-          value: allTickets.filter(t => t.priorityId === 3).length,
-        },
-        {
-          name: "Baja",
-          value: allTickets.filter(t => t.priorityId === 4).length,
-        },
-      ]
+      {
+        name: "Crítica",
+        value: allTickets.filter(t => t.priorityId === 1).length,
+      },
+      {
+        name: "Alta",
+        value: allTickets.filter(t => t.priorityId === 2).length,
+      },
+      {
+        name: "Media",
+        value: allTickets.filter(t => t.priorityId === 3).length,
+      },
+      {
+        name: "Baja",
+        value: allTickets.filter(t => t.priorityId === 4).length,
+      },
+    ]
     : [];
 
   const COLORS = ["#3B82F6", "#8B5CF6", "#10B981", "#F59E0B", "#EF4444"];
@@ -217,32 +225,56 @@ export default function Dashboard() {
             <CardDescription>Últimos 5 tickets creados</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="space-y-4">
-              {allTickets &&
-                allTickets.slice(0, 5).map(ticket => (
-                  <div
-                    key={ticket.id}
-                    className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
-                  >
-                    <div className="flex-1">
-                      <p className="font-medium text-sm">{ticket.title}</p>
-                      <p className="text-xs text-gray-500">
-                        {ticket.ticketNumber}
-                      </p>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Badge variant="outline" className="text-xs">
-                        {ticket.statusId === 1
-                          ? "Abierto"
-                          : ticket.statusId === 2
-                            ? "En Progreso"
-                            : ticket.statusId === 3
-                              ? "Resuelto"
-                              : "Cerrado"}
-                      </Badge>
-                    </div>
-                  </div>
-                ))}
+            <div className="overflow-hidden">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="w-[120px]">Folio</TableHead>
+                    <TableHead>Título</TableHead>
+                    <TableHead>Estado</TableHead>
+                    <TableHead>Prioridad</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {allTickets &&
+                    allTickets.slice(0, 5).map(ticket => (
+                      <TableRow
+                        key={ticket.id}
+                        className="cursor-pointer hover:bg-gray-50 transition-colors text-sm"
+                        onClick={() => (window.location.href = `/tickets/${ticket.id}`)}
+                      >
+                        <TableCell className="font-mono font-medium text-blue-600">
+                          {ticket.folio}
+                        </TableCell>
+                        <TableCell className="max-w-[200px] truncate">
+                          {ticket.title}
+                        </TableCell>
+                        <TableCell>
+                          <Badge variant="outline" className="text-[10px] px-1 h-5">
+                            {ticket.statusId === 1
+                              ? "Abierto"
+                              : ticket.statusId === 2
+                                ? "En Progreso"
+                                : ticket.statusId === 3
+                                  ? "Resuelto"
+                                  : "Cerrado"}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>
+                          <Badge variant="secondary" className="text-[10px] px-1 h-5">
+                            {ticket.priorityId === 1
+                              ? "Crítica"
+                              : ticket.priorityId === 2
+                                ? "Alta"
+                                : ticket.priorityId === 3
+                                  ? "Media"
+                                  : "Baja"}
+                          </Badge>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                </TableBody>
+              </Table>
             </div>
           </CardContent>
         </Card>

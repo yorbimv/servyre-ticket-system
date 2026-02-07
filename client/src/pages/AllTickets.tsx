@@ -2,12 +2,14 @@ import { useState } from "react";
 import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import {
@@ -17,16 +19,41 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Loader2, Search } from "lucide-react";
+import { Loader2, Search, MessageSquare, Pencil, Trash } from "lucide-react";
+import { toast } from "sonner";
+import { EditTicketDialog } from "@/components/EditTicketDialog";
+import { useAuth } from "@/_core/hooks/useAuth";
 import { useLocation } from "wouter";
 import AppLayout from "@/components/AppLayout";
 
 export default function AllTickets() {
   const [, navigate] = useLocation();
+  const { user } = useAuth();
+  const utils = trpc.useUtils();
   const { data: tickets, isLoading } = trpc.tickets.getAll.useQuery();
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState("all");
   const [filterPriority, setFilterPriority] = useState("all");
+
+  const [editingTicket, setEditingTicket] = useState<any>(null);
+  const [isEditing, setIsEditing] = useState(false);
+  const deleteTicketAdmin = trpc.tickets.deleteTicketAdmin.useMutation();
+
+  const handleDeleteTicket = async (e: React.MouseEvent, ticketId: number) => {
+    e.stopPropagation(); // Prevent row click
+    if (!confirm("¿Estás seguro de eliminar este ticket y todo su historial?")) return;
+    try {
+      await deleteTicketAdmin.mutateAsync({ ticketId });
+      toast.success("Ticket eliminado");
+      utils.tickets.getAll.invalidate();
+    } catch (e) { toast.error("Error al eliminar ticket"); }
+  };
+
+  const handleEditClick = (e: React.MouseEvent, ticket: any) => {
+    e.stopPropagation(); // Prevent row click
+    setEditingTicket(ticket);
+    setIsEditing(true);
+  };
 
   const filteredTickets =
     tickets?.filter(ticket => {
@@ -133,64 +160,101 @@ export default function AllTickets() {
             </CardContent>
           </Card>
         ) : (
-          <div className="grid gap-4">
-            {filteredTickets.map(ticket => (
-              <Card
-                key={ticket.id}
-                className="cursor-pointer hover:shadow-md transition-shadow"
-                onClick={() => navigate(`/tickets/${ticket.id}`)}
-              >
-                <CardContent className="p-6">
-                  <div className="flex items-start justify-between gap-4">
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-3 mb-2">
-                        <h3 className="text-lg font-semibold text-gray-900 truncate">
-                          {ticket.title}
-                        </h3>
-                        <Badge variant="outline" className="text-xs">
-                          {ticket.ticketNumber}
-                        </Badge>
+          <div className="bg-white rounded-lg border shadow-sm overflow-hidden">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="w-[120px]">Folio</TableHead>
+                  <TableHead>Título</TableHead>
+                  <TableHead>Estado</TableHead>
+                  <TableHead>Prioridad</TableHead>
+                  <TableHead>Creador</TableHead>
+                  <TableHead className="text-center">Comentarios</TableHead>
+                  <TableHead className="text-right">Fecha</TableHead>
+                  {user?.role === 'admin' && <TableHead className="text-right">Acciones</TableHead>}
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {filteredTickets.map(ticket => (
+                  <TableRow
+                    key={ticket.id}
+                    className="cursor-pointer hover:bg-gray-50 transition-colors"
+                    onClick={() => navigate(`/tickets/${ticket.id}`)}
+                  >
+                    <TableCell className="font-mono font-medium text-blue-600">
+                      {ticket.folio}
+                    </TableCell>
+                    <TableCell>
+                      <div className="max-w-[300px] truncate font-medium">
+                        {ticket.title}
                       </div>
-                      <p className="text-gray-600 text-sm line-clamp-2 mb-3">
-                        {ticket.description}
-                      </p>
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <Badge className={getStatusColor(ticket.statusId)}>
-                          {ticket.statusId === 1
-                            ? "Abierto"
-                            : ticket.statusId === 2
-                              ? "En Progreso"
-                              : ticket.statusId === 3
-                                ? "Resuelto"
-                                : "Cerrado"}
-                        </Badge>
-                        <Badge className={getPriorityColor(ticket.priorityId)}>
-                          {ticket.priorityId === 1
-                            ? "Crítica"
-                            : ticket.priorityId === 2
-                              ? "Alta"
-                              : ticket.priorityId === 3
-                                ? "Media"
-                                : "Baja"}
-                        </Badge>
+                      <div className="text-xs text-gray-500 truncate">
+                        {ticket.description.substring(0, 50)}...
                       </div>
-                    </div>
-                    <div className="text-right text-sm text-gray-500 min-w-fit">
-                      <p>
-                        Creado:{" "}
-                        {new Date(ticket.createdAt).toLocaleDateString("es-ES")}
-                      </p>
-                      {ticket.assignedToUserId && (
-                        <p className="text-blue-600">Asignado</p>
+                    </TableCell>
+                    <TableCell>
+                      <Badge className={getStatusColor(ticket.statusId)}>
+                        {ticket.statusId === 1
+                          ? "Abierto"
+                          : ticket.statusId === 2
+                            ? "En Progreso"
+                            : ticket.statusId === 3
+                              ? "Resuelto"
+                              : "Cerrado"}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>
+                      <Badge className={getPriorityColor(ticket.priorityId)}>
+                        {ticket.priorityId === 1
+                          ? "Crítica"
+                          : ticket.priorityId === 2
+                            ? "Alta"
+                            : ticket.priorityId === 3
+                              ? "Media"
+                              : "Baja"}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="text-sm">
+                      {ticket.userName || "Admin"}
+                    </TableCell>
+                    <TableCell className="text-center">
+                      {ticket.commentCount > 0 ? (
+                        <div className="flex items-center justify-center gap-1 text-gray-500">
+                          <MessageSquare className="w-4 h-4" />
+                          <span className="text-xs">{ticket.commentCount}</span>
+                        </div>
+                      ) : (
+                        <span className="text-gray-300">-</span>
                       )}
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
+                    </TableCell>
+                    <TableCell className="text-right text-xs text-gray-500 whitespace-nowrap">
+                      {new Date(ticket.createdAt).toLocaleDateString("es-ES")}
+                    </TableCell>
+                    {user?.role === 'admin' && (
+                      <TableCell className="text-right">
+                        <div className="flex justify-end gap-1">
+                          <Button variant="ghost" size="sm" className="h-8 w-8 p-0" onClick={(e) => handleEditClick(e, ticket)}>
+                            <Pencil className="w-4 h-4 text-gray-500" />
+                          </Button>
+                          <Button variant="ghost" size="sm" className="h-8 w-8 p-0 hover:text-red-600" onClick={(e) => handleDeleteTicket(e, ticket.id)}>
+                            <Trash className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      </TableCell>
+                    )}
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
           </div>
         )}
       </div>
+      <EditTicketDialog
+        open={isEditing}
+        onOpenChange={setIsEditing}
+        ticket={editingTicket}
+        onSuccess={() => utils.tickets.getAll.invalidate()}
+      />
     </AppLayout>
   );
 }

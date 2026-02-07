@@ -1,4 +1,6 @@
 import { COOKIE_NAME } from "@shared/const";
+import fs from "fs";
+import path from "path";
 import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
 import { publicProcedure, router, protectedProcedure } from "./_core/trpc";
@@ -11,6 +13,25 @@ import {
   getTechnicians,
   getUserTickets,
   getAllTickets,
+  getUsers,
+  createUser,
+  updateUser,
+  createCategory,
+  updateCategory,
+  deleteCategory,
+  getAllPriorities,
+  createPriority,
+  updatePriority,
+  getCategoryFailures,
+  createCategoryFailure,
+  updateCategoryFailure,
+  deleteCategoryFailure,
+  getDepartments,
+  getAllDepartments,
+  createDepartment,
+  updateDepartment,
+  deleteDepartment,
+  getNextFolio,
 } from "./db";
 import { z } from "zod";
 import {
@@ -22,6 +43,7 @@ import {
   attachments,
   ticketHistory,
   notifications,
+  users,
 } from "../drizzle/schema";
 import { eq, and, or, like, desc, asc } from "drizzle-orm";
 
@@ -74,6 +96,14 @@ export const appRouter = router({
     getTechnicians: protectedProcedure.query(async () => {
       return await getTechnicians();
     }),
+    getCategoryFailures: protectedProcedure
+      .input(z.object({ categoryId: z.number() }))
+      .query(async ({ input }) => {
+        return await getCategoryFailures(input.categoryId);
+      }),
+    getDepartments: protectedProcedure.query(async () => {
+      return await getDepartments();
+    }),
   }),
 
   // Procedimientos para tickets
@@ -84,12 +114,18 @@ export const appRouter = router({
         z.object({
           title: z
             .string()
-            .min(5, "El título debe tener al menos 5 caracteres"),
+            .min(3, "El título debe tener al menos 3 caracteres"),
           description: z
             .string()
             .min(10, "La descripción debe tener al menos 10 caracteres"),
           categoryId: z.number(),
           priorityId: z.number(),
+          departmentId: z.number(),
+          userName: z.string().min(1, "El nombre de usuario es requerido"),
+          userEmail: z.string().email("Correo inválido").refine((email) => /@servyre\./.test(email), {
+            message: "El correo debe ser del dominio @servyre (ej: usuario@servyre.com)"
+          }),
+          branch: z.enum(["SRV", "NAUC"]).default("SRV"),
         })
       )
       .mutation(async ({ ctx, input }) => {
@@ -112,16 +148,24 @@ export const appRouter = router({
           });
         }
 
-        // Generar número de ticket único
-        const ticketNumber = `TKT-${Date.now()}-${Math.random().toString(36).substr(2, 9).toUpperCase()}`;
+        // Generar Folio y Número de Ticket homologados
+        const nextFolioNum = await getNextFolio();
+        const branchStr = input.branch || "SRV";
+        const folioStr = `${branchStr} - ${nextFolioNum}`;
+        const ticketNumber = `TKT-${branchStr}-${nextFolioNum}`;
 
         const result = await db.insert(tickets).values({
+          branch: branchStr,
+          folio: folioStr,
           ticketNumber,
           title: input.title,
           description: input.description,
           categoryId: input.categoryId,
           statusId: initialStatus.id,
           priorityId: input.priorityId,
+          departmentId: input.departmentId,
+          userName: input.userName,
+          userEmail: input.userEmail,
           createdByUserId: ctx.user.id,
           createdAt: new Date(),
           updatedAt: new Date(),
@@ -316,13 +360,25 @@ export const appRouter = router({
       .input(
         z.object({
           ticketId: z.number(),
-          content: z.string().min(1),
+          content: z.string().optional(),
           isInternal: z.boolean().default(false),
+          attachment: z.object({
+            name: z.string(),
+            base64: z.string(),
+          }).optional(),
         })
       )
       .mutation(async ({ ctx, input }) => {
         const db = await getDb();
         if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
+
+        // Validar que exista al menos contenido o adjunto
+        if (!input.content && !input.attachment) {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "El comentario no puede estar vacío"
+          });
+        }
 
         // Verificar que el ticket existe y el usuario tiene permisos
         const ticket = await db
@@ -353,10 +409,44 @@ export const appRouter = router({
           });
         }
 
+        let attachmentUrl = null;
+        let attachmentName = null;
+
+        if (input.attachment) {
+          try {
+            // Remove prefix if present (data:image/png;base64,)
+            const base64Data = input.attachment.base64.includes(',')
+              ? input.attachment.base64.split(',')[1]
+              : input.attachment.base64;
+
+            const buffer = Buffer.from(base64Data, 'base64');
+            const safeName = input.attachment.name.replace(/[^a-zA-Z0-9.-]/g, '_');
+            const fileName = `${Date.now()}-${safeName}`;
+            const uploadDir = path.join(process.cwd(), 'uploads');
+            const filePath = path.join(uploadDir, fileName);
+
+            if (!fs.existsSync(uploadDir)) {
+              fs.mkdirSync(uploadDir, { recursive: true });
+            }
+
+            fs.writeFileSync(filePath, buffer);
+            attachmentUrl = `/uploads/${fileName}`;
+            attachmentName = input.attachment.name;
+          } catch (e) {
+            console.error("Error saving attachment:", e);
+            throw new TRPCError({
+              code: "INTERNAL_SERVER_ERROR",
+              message: "Error al guardar el archivo adjunto"
+            });
+          }
+        }
+
         const result = await db.insert(ticketComments).values({
           ticketId: input.ticketId,
           userId: ctx.user.id,
-          content: input.content,
+          content: input.content || "",
+          attachmentUrl,
+          attachmentName,
           isInternal: input.isInternal,
           createdAt: new Date(),
           updatedAt: new Date(),
@@ -368,7 +458,7 @@ export const appRouter = router({
           changedByUserId: ctx.user.id,
           fieldName: "comment",
           changeType: "comment_added",
-          description: "Comentario agregado",
+          description: attachmentName ? "Comentario con archivo adjunto" : "Comentario agregado",
           createdAt: new Date(),
         });
 
@@ -409,16 +499,31 @@ export const appRouter = router({
 
         if (!isCreator && !isTechnicianOrAdmin) return [];
 
-        // Si es usuario final, no mostrar comentarios internos
-        const whereClause = isTechnicianOrAdmin
-          ? undefined
-          : eq(ticketComments.isInternal, false);
-
-        const comments = await db
-          .select()
+        const result = await db
+          .select({
+            id: ticketComments.id,
+            ticketId: ticketComments.ticketId,
+            userId: ticketComments.userId,
+            content: ticketComments.content,
+            attachmentUrl: ticketComments.attachmentUrl,
+            attachmentName: ticketComments.attachmentName,
+            isInternal: ticketComments.isInternal,
+            createdAt: ticketComments.createdAt,
+            updatedAt: ticketComments.updatedAt,
+            userRole: users.role,
+            userName: users.name,
+          })
           .from(ticketComments)
-          .where(whereClause ? whereClause : undefined);
-        return comments.filter(c => c.ticketId === input.ticketId);
+          .leftJoin(users, eq(ticketComments.userId, users.id))
+          .where(
+            and(
+              eq(ticketComments.ticketId, input.ticketId),
+              isTechnicianOrAdmin ? undefined : eq(ticketComments.isInternal, false)
+            )
+          )
+          .orderBy(desc(ticketComments.createdAt));
+
+        return result;
       }),
 
     // Obtener historial de un ticket
@@ -446,6 +551,90 @@ export const appRouter = router({
           .from(ticketHistory)
           .where(eq(ticketHistory.ticketId, input.ticketId));
         return history;
+      }),
+
+    updateComment: adminProcedure
+      .input(z.object({ commentId: z.number(), content: z.string().min(1) }))
+      .mutation(async ({ ctx, input }) => {
+        const db = await getDb();
+        if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
+        await db
+          .update(ticketComments)
+          .set({ content: input.content, updatedAt: new Date() })
+          .where(eq(ticketComments.id, input.commentId));
+        return { success: true };
+      }),
+
+    deleteComment: adminProcedure
+      .input(z.object({ commentId: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        const db = await getDb();
+        if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
+        await db
+          .delete(ticketComments)
+          .where(eq(ticketComments.id, input.commentId));
+        return { success: true };
+      }),
+
+    updateTicketAdmin: adminProcedure
+      .input(
+        z.object({
+          ticketId: z.number(),
+          title: z.string().min(1),
+          description: z.string().min(1),
+          statusId: z.number(),
+          priorityId: z.number(),
+          categoryId: z.number(),
+        })
+      )
+      .mutation(async ({ ctx, input }) => {
+        const db = await getDb();
+        if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
+
+        await db
+          .update(tickets)
+          .set({
+            title: input.title,
+            description: input.description,
+            statusId: input.statusId,
+            priorityId: input.priorityId,
+            categoryId: input.categoryId,
+            updatedAt: new Date(),
+          })
+          .where(eq(tickets.id, input.ticketId));
+
+        await db.insert(ticketHistory).values({
+          ticketId: input.ticketId,
+          changedByUserId: ctx.user.id,
+          fieldName: "admin_update",
+          changeType: "update",
+          description: "Actualización administrativa del ticket",
+          createdAt: new Date(),
+        });
+
+        return { success: true };
+      }),
+
+    deleteTicketAdmin: adminProcedure
+      .input(z.object({ ticketId: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        const db = await getDb();
+        if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
+
+        // Delete dependencies first (Hard Delete)
+        await db
+          .delete(ticketComments)
+          .where(eq(ticketComments.ticketId, input.ticketId));
+        await db
+          .delete(ticketHistory)
+          .where(eq(ticketHistory.ticketId, input.ticketId));
+        await db
+          .delete(notifications)
+          .where(eq(notifications.ticketId, input.ticketId));
+        // Delete ticket
+        await db.delete(tickets).where(eq(tickets.id, input.ticketId));
+
+        return { success: true };
       }),
   }),
 
@@ -502,6 +691,225 @@ export const appRouter = router({
             : "0",
       };
     }),
+
+    // Gestión de Usuarios
+    getAllUsers: adminProcedure.query(async () => {
+      return await getUsers();
+    }),
+
+    createUser: adminProcedure
+      .input(
+        z.object({
+          name: z.string().min(1),
+          email: z.string().email(),
+          role: z.enum(["user", "technician", "admin"]),
+          department: z.string().optional(),
+        })
+      )
+      .mutation(async ({ input }) => {
+        // Generate a random openId for manually created users
+        const openId = `manual-${Math.random().toString(36).substring(2, 15)}`;
+        await createUser({
+          openId,
+          name: input.name,
+          email: input.email,
+          role: input.role,
+          department: input.department,
+        });
+        return { success: true };
+      }),
+
+    updateUser: adminProcedure
+      .input(
+        z.object({
+          userId: z.number(),
+          name: z.string().optional(),
+          email: z.string().email().optional(),
+          role: z.enum(["user", "technician", "admin"]).optional(),
+          isActive: z.boolean().optional(),
+          department: z.string().optional(),
+        })
+      )
+      .mutation(async ({ input }) => {
+        await updateUser(input.userId, {
+          name: input.name,
+          email: input.email,
+          role: input.role,
+          isActive: input.isActive,
+          department: input.department,
+        });
+        return { success: true };
+      }),
+
+    deleteUser: adminProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ input }) => {
+        await updateUser(input.id, { isActive: false });
+        return { success: true };
+      }),
+
+    // Gestión de Categorías
+    createCategory: adminProcedure
+      .input(
+        z.object({
+          name: z.string().min(1),
+          description: z.string().optional(),
+          color: z.string().optional(),
+        })
+      )
+      .mutation(async ({ input }) => {
+        await createCategory({
+          name: input.name,
+          description: input.description,
+          color: input.color || "#3B82F6",
+        });
+        return { success: true };
+      }),
+
+    updateCategory: adminProcedure
+      .input(
+        z.object({
+          id: z.number(),
+          name: z.string().optional(),
+          description: z.string().optional(),
+          color: z.string().optional(),
+          isActive: z.boolean().optional(),
+        })
+      )
+      .mutation(async ({ input }) => {
+        await updateCategory(input.id, {
+          name: input.name,
+          description: input.description,
+          color: input.color,
+          isActive: input.isActive,
+        });
+        return { success: true };
+      }),
+
+    deleteCategory: adminProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ input }) => {
+        await deleteCategory(input.id);
+        return { success: true };
+      }),
+
+    // Gestión de Fallas por Categoría
+    createCategoryFailure: adminProcedure
+      .input(
+        z.object({
+          categoryId: z.number(),
+          name: z.string().min(1),
+        })
+      )
+      .mutation(async ({ input }) => {
+        await createCategoryFailure({
+          categoryId: input.categoryId,
+          name: input.name,
+        });
+        return { success: true };
+      }),
+
+    updateCategoryFailure: adminProcedure
+      .input(
+        z.object({
+          id: z.number(),
+          name: z.string().optional(),
+          isActive: z.boolean().optional(),
+        })
+      )
+      .mutation(async ({ input }) => {
+        const { id, ...data } = input;
+        await updateCategoryFailure(id, data);
+        return { success: true };
+      }),
+
+    deleteCategoryFailure: adminProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ input }) => {
+        await deleteCategoryFailure(input.id);
+        return { success: true };
+      }),
+
+    // Gestión de Prioridades
+    getAllPriorities: adminProcedure.query(async () => {
+      return await getAllPriorities();
+    }),
+
+    createPriority: adminProcedure
+      .input(
+        z.object({
+          name: z.string().min(1),
+          displayName: z.string().min(1),
+          level: z.number(),
+          color: z.string().regex(/^#[0-9A-Fa-f]{6}$/),
+        })
+      )
+      .mutation(async ({ input }) => {
+        await createPriority({
+          name: input.name,
+          displayName: input.displayName,
+          level: input.level,
+          color: input.color,
+        });
+        return { success: true };
+      }),
+
+    updatePriority: adminProcedure
+      .input(
+        z.object({
+          id: z.number(),
+          name: z.string().optional(),
+          displayName: z.string().optional(),
+          level: z.number().optional(),
+          color: z.string().regex(/^#[0-9A-Fa-f]{6}$/).optional(),
+          isActive: z.boolean().optional(),
+        })
+      )
+      .mutation(async ({ input }) => {
+        const { id, ...data } = input;
+        await updatePriority(id, data);
+        return { success: true };
+      }),
+
+    deletePriority: adminProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ input }) => {
+        await updatePriority(input.id, { isActive: false });
+        return { success: true };
+      }),
+
+    // Gestión de Departamentos
+    getAllDepartments: adminProcedure.query(async () => {
+      return await getAllDepartments();
+    }),
+
+    createDepartment: adminProcedure
+      .input(z.object({ name: z.string().min(1) }))
+      .mutation(async ({ input }) => {
+        await createDepartment({ name: input.name });
+        return { success: true };
+      }),
+
+    updateDepartment: adminProcedure
+      .input(
+        z.object({
+          id: z.number(),
+          name: z.string().optional(),
+          isActive: z.boolean().optional(),
+        })
+      )
+      .mutation(async ({ input }) => {
+        const { id, ...data } = input;
+        await updateDepartment(id, data);
+        return { success: true };
+      }),
+
+    deleteDepartment: adminProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ input }) => {
+        await deleteDepartment(input.id);
+        return { success: true };
+      }),
 
     generateReport: adminProcedure
       .input(

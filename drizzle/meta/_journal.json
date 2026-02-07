@@ -15,6 +15,34 @@
       "when": 1770226569440,
       "tag": "0001_parched_deathbird",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1770331658977,
+      "tag": "0002_lazy_cobalt_man",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "5",
+      "when": 1770333250270,
+      "tag": "0003_curvy_tomorrow_man",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "5",
+      "when": 1770341303818,
+      "tag": "0004_broad_phantom_reporter",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "5",
+      "when": 1770415226708,
+      "tag": "0005_loose_kronos",
+      "breakpoints": true
     }
   ]
 }

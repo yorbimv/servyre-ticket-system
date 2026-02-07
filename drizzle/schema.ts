@@ -62,6 +62,37 @@ export const categories = mysqlTable("categories", {
 export type Category = typeof categories.$inferSelect;
 export type InsertCategory = typeof categories.$inferInsert;
 
+// Departamentos
+export const departments = mysqlTable("departments", {
+  id: int("id").autoincrement().primaryKey(),
+  name: varchar("name", { length: 100 }).notNull().unique(),
+  isActive: boolean("isActive").default(true).notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type Department = typeof departments.$inferSelect;
+export type InsertDepartment = typeof departments.$inferInsert;
+
+// Fallas por categoría
+export const categoryFailures = mysqlTable(
+  "category_failures",
+  {
+    id: int("id").autoincrement().primaryKey(),
+    categoryId: int("categoryId").notNull(),
+    name: varchar("name", { length: 255 }).notNull(),
+    isActive: boolean("isActive").default(true).notNull(),
+    createdAt: timestamp("createdAt").defaultNow().notNull(),
+    updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  },
+  table => ({
+    categoryIdx: index("category_idx").on(table.categoryId),
+  })
+);
+
+export type CategoryFailure = typeof categoryFailures.$inferSelect;
+export type InsertCategoryFailure = typeof categoryFailures.$inferInsert;
+
 // Estados de tickets
 export const ticketStatuses = mysqlTable("ticket_statuses", {
   id: int("id").autoincrement().primaryKey(),
@@ -96,12 +127,17 @@ export const tickets = mysqlTable(
   "tickets",
   {
     id: int("id").autoincrement().primaryKey(),
+    branch: varchar("branch", { length: 10 }).default("SRV").notNull(),
+    folio: varchar("folio", { length: 50 }).notNull().unique(),
     ticketNumber: varchar("ticketNumber", { length: 50 }).notNull().unique(),
     title: varchar("title", { length: 255 }).notNull(),
     description: text("description").notNull(),
     categoryId: int("categoryId").notNull(),
     statusId: int("statusId").notNull(),
     priorityId: int("priorityId").notNull(),
+    departmentId: int("departmentId"),
+    userName: varchar("userName", { length: 255 }),
+    userEmail: varchar("userEmail", { length: 320 }),
     createdByUserId: int("createdByUserId").notNull(),
     assignedToUserId: int("assignedToUserId"),
     technicalReport: text("technicalReport"),
@@ -138,7 +174,9 @@ export const ticketComments = mysqlTable(
     id: int("id").autoincrement().primaryKey(),
     ticketId: int("ticketId").notNull(),
     userId: int("userId").notNull(),
-    content: text("content").notNull(),
+    content: text("content"),
+    attachmentUrl: text("attachmentUrl"),
+    attachmentName: varchar("attachmentName", { length: 255 }),
     isInternal: boolean("isInternal").default(false).notNull(),
     createdAt: timestamp("createdAt").defaultNow().notNull(),
     updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
@@ -284,6 +322,10 @@ export const ticketsRelations = relations(tickets, ({ one, many }) => ({
     fields: [tickets.priorityId],
     references: [priorities.id],
   }),
+  department: one(departments, {
+    fields: [tickets.departmentId],
+    references: [departments.id],
+  }),
   createdBy: one(users, {
     fields: [tickets.createdByUserId],
     references: [users.id],
@@ -344,7 +386,18 @@ export const activityLogsRelations = relations(activityLogs, ({ one }) => ({
 
 export const categoriesRelations = relations(categories, ({ many }) => ({
   tickets: many(tickets),
+  failures: many(categoryFailures),
 }));
+
+export const categoryFailuresRelations = relations(
+  categoryFailures,
+  ({ one }) => ({
+    category: one(categories, {
+      fields: [categoryFailures.categoryId],
+      references: [categories.id],
+    }),
+  })
+);
 
 export const ticketStatusesRelations = relations(
   ticketStatuses,
@@ -354,5 +407,9 @@ export const ticketStatusesRelations = relations(
 );
 
 export const prioritiesRelations = relations(priorities, ({ many }) => ({
+  tickets: many(tickets),
+}));
+
+export const departmentsRelations = relations(departments, ({ many }) => ({
   tickets: many(tickets),
 }));
