@@ -355,7 +355,7 @@ export default function TicketDetail() {
                       <div className="flex items-center gap-2">
                         <p className="font-medium text-sm">{comment.userName || "Usuario"}</p>
                         {comment.userRole === 'admin' && <Badge variant="destructive" className="text-[10px] px-1 py-0 h-5">Admin</Badge>}
-                        {comment.userRole === 'technician' && <Badge variant="secondary" className="text-[10px] px-1 py-0 h-5 bg-blue-100 text-blue-800">Técnico</Badge>}
+                        {comment.userRole === 'technician' && <Badge variant="secondary" className="text-[10px] px-1 py-0 h-5 bg-blue-100 text-blue-800">Soporte Técnico</Badge>}
                       </div>
                       <div className="flex items-center gap-2">
                         <p className="text-xs text-gray-500">

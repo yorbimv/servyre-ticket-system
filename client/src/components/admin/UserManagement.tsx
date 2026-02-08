@@ -23,7 +23,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
-import { Loader2, UserCog, UserPlus } from "lucide-react";
+import { Loader2, UserCog, UserPlus, Trash2, Edit2 } from "lucide-react";
 import { toast } from "sonner";
 import {
     Dialog,
@@ -34,13 +34,28 @@ import {
     DialogTitle,
     DialogTrigger
 } from "@/components/ui/dialog";
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
 
 export function UserManagement() {
     const usersQuery = trpc.admin.getAllUsers.useQuery();
     const utils = trpc.useUtils();
+
+    // Dialog states
     const [isDialogOpen, setIsDialogOpen] = useState(false);
+    const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+
+    // Form states
     const [newUser, setNewUser] = useState({
         name: "",
         email: "",
@@ -48,6 +63,17 @@ export function UserManagement() {
         department: "",
     });
 
+    const [editingUser, setEditingUser] = useState<{
+        id: number;
+        name: string;
+        email: string;
+        role: "user" | "technician" | "admin";
+        department: string;
+    } | null>(null);
+
+    const [userToDelete, setUserToDelete] = useState<{ id: number; name: string } | null>(null);
+
+    // Mutations
     const createUserMutation = trpc.admin.createUser.useMutation({
         onSuccess: () => {
             toast.success("Usuario creado correctamente");
@@ -64,15 +90,43 @@ export function UserManagement() {
         onSuccess: () => {
             toast.success("Usuario actualizado correctamente");
             utils.admin.getAllUsers.invalidate();
+            if (isEditDialogOpen) {
+                setIsEditDialogOpen(false);
+                setEditingUser(null);
+            }
         },
-        onError: () => {
-            toast.error("Error al actualizar el usuario");
+        onError: (error) => {
+            toast.error(error.message || "Error al actualizar el usuario");
         },
     });
 
+    const deleteUserMutation = trpc.admin.deleteUser.useMutation({
+        onSuccess: () => {
+            toast.success("Usuario eliminado correctamente");
+            utils.admin.getAllUsers.invalidate();
+        },
+        onError: (error) => {
+            toast.error(error.message || "Error al eliminar el usuario");
+        },
+    });
+
+    // Handlers
     const handleCreateUser = async (e: React.FormEvent) => {
         e.preventDefault();
         await createUserMutation.mutateAsync(newUser);
+    };
+
+    const handleUpdateUser = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!editingUser) return;
+
+        await updateUserMutation.mutateAsync({
+            userId: editingUser.id,
+            name: editingUser.name,
+            email: editingUser.email,
+            role: editingUser.role,
+            department: editingUser.department,
+        });
     };
 
     const handleRoleChange = async (userId: number, role: string) => {
@@ -82,11 +136,21 @@ export function UserManagement() {
         });
     };
 
-    const handleToggleStatus = async (userId: number, isActive: boolean) => {
-        await updateUserMutation.mutateAsync({
-            userId,
-            isActive,
+    const handleDeleteUser = async () => {
+        if (!userToDelete) return;
+        await deleteUserMutation.mutateAsync({ id: userToDelete.id });
+        setUserToDelete(null);
+    };
+
+    const openEditDialog = (user: any) => {
+        setEditingUser({
+            id: user.id,
+            name: user.name,
+            email: user.email,
+            role: user.role,
+            department: user.department || "",
         });
+        setIsEditDialogOpen(true);
     };
 
     if (usersQuery.isLoading) {
@@ -154,7 +218,7 @@ export function UserManagement() {
                                     </SelectTrigger>
                                     <SelectContent>
                                         <SelectItem value="user">Usuario</SelectItem>
-                                        <SelectItem value="technician">Técnico</SelectItem>
+                                        <SelectItem value="technician">Soporte Técnico</SelectItem>
                                         <SelectItem value="admin">Administrador</SelectItem>
                                     </SelectContent>
                                 </Select>
@@ -200,12 +264,12 @@ export function UserManagement() {
                                         onValueChange={(val) => handleRoleChange(user.id, val)}
                                         disabled={updateUserMutation.isPending}
                                     >
-                                        <SelectTrigger className="w-32 h-8 text-xs">
+                                        <SelectTrigger className="w-40 h-8 text-xs">
                                             <SelectValue />
                                         </SelectTrigger>
                                         <SelectContent>
                                             <SelectItem value="user">Usuario</SelectItem>
-                                            <SelectItem value="technician">Técnico</SelectItem>
+                                            <SelectItem value="technician">Soporte Técnico</SelectItem>
                                             <SelectItem value="admin">Administrador</SelectItem>
                                         </SelectContent>
                                     </Select>
@@ -222,21 +286,118 @@ export function UserManagement() {
                                     )}
                                 </TableCell>
                                 <TableCell className="text-right">
-                                    <Button
-                                        variant="ghost"
-                                        size="sm"
-                                        onClick={() => handleToggleStatus(user.id, !user.isActive)}
-                                        disabled={updateUserMutation.isPending}
-                                        className={user.isActive ? "text-red-600" : "text-green-600"}
-                                    >
-                                        {user.isActive ? "Desactivar" : "Activar"}
-                                    </Button>
+                                    <div className="flex justify-end gap-2">
+                                        <Button
+                                            variant="ghost"
+                                            size="sm"
+                                            onClick={() => openEditDialog(user)}
+                                            className="text-blue-500 hover:text-blue-700 hover:bg-blue-50"
+                                        >
+                                            <Edit2 className="w-4 h-4" />
+                                        </Button>
+                                        <Button
+                                            variant="ghost"
+                                            size="sm"
+                                            onClick={() => setUserToDelete({ id: user.id, name: user.name || "Usuario" })}
+                                            disabled={deleteUserMutation.isPending}
+                                            className="text-red-500 hover:text-red-700 hover:bg-red-50"
+                                        >
+                                            <Trash2 className="w-4 h-4" />
+                                        </Button>
+                                    </div>
                                 </TableCell>
                             </TableRow>
                         ))}
                     </TableBody>
                 </Table>
             </CardContent>
+
+            {/* Edit Dialog */}
+            <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>Editar Usuario</DialogTitle>
+                        <DialogDescription>
+                            Modifica la información del usuario
+                        </DialogDescription>
+                    </DialogHeader>
+                    {editingUser && (
+                        <form onSubmit={handleUpdateUser} className="space-y-4 py-4">
+                            <div className="space-y-2">
+                                <label className="text-sm font-medium">Nombre</label>
+                                <Input
+                                    value={editingUser.name}
+                                    onChange={e => setEditingUser({ ...editingUser, name: e.target.value })}
+                                    placeholder="Nombre completo"
+                                    required
+                                />
+                            </div>
+                            <div className="space-y-2">
+                                <label className="text-sm font-medium">Email</label>
+                                <Input
+                                    type="email"
+                                    value={editingUser.email}
+                                    onChange={e => setEditingUser({ ...editingUser, email: e.target.value })}
+                                    placeholder="usuario@ejemplo.com"
+                                    required
+                                />
+                            </div>
+                            <div className="space-y-2">
+                                <label className="text-sm font-medium">Rol</label>
+                                <Select
+                                    value={editingUser.role}
+                                    onValueChange={(val: any) => setEditingUser({ ...editingUser, role: val })}
+                                >
+                                    <SelectTrigger>
+                                        <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="user">Usuario</SelectItem>
+                                        <SelectItem value="technician">Técnico</SelectItem>
+                                        <SelectItem value="admin">Administrador</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                            <div className="space-y-2">
+                                <label className="text-sm font-medium">Departamento</label>
+                                <Input
+                                    value={editingUser.department}
+                                    onChange={e => setEditingUser({ ...editingUser, department: e.target.value })}
+                                    placeholder="IT, Ventas, etc."
+                                />
+                            </div>
+                            <DialogFooter>
+                                <Button type="submit" disabled={updateUserMutation.isPending}>
+                                    {updateUserMutation.isPending && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+                                    Guardar Cambios
+                                </Button>
+                            </DialogFooter>
+                        </form>
+                    )}
+                </DialogContent>
+            </Dialog>
+
+            {/* Delete Confirmation Alert */}
+            <AlertDialog open={!!userToDelete} onOpenChange={(open) => !open && setUserToDelete(null)}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>¿Estás completamente seguro?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            Esta acción no se puede deshacer. Esto eliminará permanentemente al usuario
+                            <strong> {userToDelete?.name}</strong> y todos sus datos asociados.
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                        <AlertDialogAction
+                            onClick={handleDeleteUser}
+                            className="bg-red-600 hover:bg-red-700"
+                        >
+                            Eliminar
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
         </Card>
     );
 }

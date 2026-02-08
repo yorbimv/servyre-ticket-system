@@ -38,11 +38,14 @@ export default function DepartmentManagement() {
         },
     });
 
-    const updateMutation = trpc.admin.updateDepartment.useMutation({
+    const deleteMutation = trpc.admin.deleteDepartment.useMutation({
         onSuccess: () => {
             utils.admin.getAllDepartments.invalidate();
-            toast.success("Estado actualizado");
+            toast.success("Departamento eliminado");
         },
+        onError: (error) => {
+            toast.error(`Error: ${error.message}`);
+        }
     });
 
     const handleSubmit = (e: React.FormEvent) => {
@@ -51,8 +54,10 @@ export default function DepartmentManagement() {
         createMutation.mutate({ name: newName });
     };
 
-    const toggleStatus = (id: number, isActive: boolean) => {
-        updateMutation.mutate({ id, isActive });
+    const handleDelete = (id: number, name: string) => {
+        if (confirm(`¿Estás seguro de eliminar el departamento "${name}"?`)) {
+            deleteMutation.mutate({ id });
+        }
     };
 
     return (
@@ -135,10 +140,10 @@ export default function DepartmentManagement() {
                                             <Button
                                                 variant="ghost"
                                                 size="sm"
-                                                onClick={() => toggleStatus(dept.id, !dept.isActive)}
-                                                className={dept.isActive ? "text-destructive hover:text-destructive hover:bg-destructive/10" : "text-green-600 hover:text-green-700 hover:bg-green-50"}
+                                                onClick={() => handleDelete(dept.id, dept.name)}
+                                                className="text-red-500 hover:text-red-700 hover:bg-red-50"
                                             >
-                                                {dept.isActive ? "Desactivar" : "Activar"}
+                                                <Trash2 className="w-4 h-4" />
                                             </Button>
                                         </TableCell>
                                     </TableRow>

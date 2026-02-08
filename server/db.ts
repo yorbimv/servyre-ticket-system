@@ -273,6 +273,21 @@ export async function updateUser(id: number, data: Partial<InsertUser>) {
   await db.update(users).set({ ...data, updatedAt: new Date() }).where(eq(users.id, id));
 }
 
+// Added hard delete function
+export async function deleteUser(id: number) {
+  console.log("[DB] deleteUser called for ID:", id);
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  try {
+    const result = await db.delete(users).where(eq(users.id, id));
+    console.log("[DB] deleteUser result:", JSON.stringify(result));
+  } catch (err) {
+    console.error("[DB] Error in deleteUser:", err);
+    throw err;
+  }
+}
+
 // Admin functions for Category Management
 export async function createCategory(data: InsertCategory) {
   const db = await getDb();
