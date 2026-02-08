@@ -16,13 +16,28 @@ import {
     Loader2,
     Building2,
     Trash2,
+    Pencil,
     CheckCircle2,
     XCircle
 } from "lucide-react";
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
 
 export default function DepartmentManagement() {
     const [newName, setNewName] = useState("");
+    const [isEditOpen, setIsEditOpen] = useState(false);
+    const [editingDept, setEditingDept] = useState<any>(null);
+    const [editName, setEditName] = useState("");
+    const [editIsActive, setEditIsActive] = useState(true);
     const utils = trpc.useUtils();
 
     const { data: departments, isLoading } = trpc.admin.getAllDepartments.useQuery();
@@ -36,6 +51,17 @@ export default function DepartmentManagement() {
         onError: (error) => {
             toast.error(`Error: ${error.message}`);
         },
+    });
+
+    const updateMutation = trpc.admin.updateDepartment.useMutation({
+        onSuccess: () => {
+            utils.admin.getAllDepartments.invalidate();
+            toast.success("Departamento actualizado");
+            setIsEditOpen(false);
+        },
+        onError: (error) => {
+            toast.error(`Error: ${error.message}`);
+        }
     });
 
     const deleteMutation = trpc.admin.deleteDepartment.useMutation({
@@ -58,6 +84,23 @@ export default function DepartmentManagement() {
         if (confirm(`¿Estás seguro de eliminar el departamento "${name}"?`)) {
             deleteMutation.mutate({ id });
         }
+    };
+
+    const handleEdit = (dept: any) => {
+        setEditingDept(dept);
+        setEditName(dept.name);
+        setEditIsActive(dept.isActive);
+        setIsEditOpen(true);
+    };
+
+    const handleUpdateSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!editName.trim() || !editingDept) return;
+        updateMutation.mutate({
+            id: editingDept.id,
+            name: editName,
+            isActive: editIsActive
+        });
     };
 
     return (
@@ -137,14 +180,24 @@ export default function DepartmentManagement() {
                                             )}
                                         </TableCell>
                                         <TableCell className="text-right">
-                                            <Button
-                                                variant="ghost"
-                                                size="sm"
-                                                onClick={() => handleDelete(dept.id, dept.name)}
-                                                className="text-red-500 hover:text-red-700 hover:bg-red-50"
-                                            >
-                                                <Trash2 className="w-4 h-4" />
-                                            </Button>
+                                            <div className="flex justify-end gap-2">
+                                                <Button
+                                                    variant="ghost"
+                                                    size="sm"
+                                                    onClick={() => handleEdit(dept)}
+                                                    className="text-blue-500 hover:text-blue-700 hover:bg-blue-50"
+                                                >
+                                                    <Pencil className="w-4 h-4" />
+                                                </Button>
+                                                <Button
+                                                    variant="ghost"
+                                                    size="sm"
+                                                    onClick={() => handleDelete(dept.id, dept.name)}
+                                                    className="text-red-500 hover:text-red-700 hover:bg-red-50"
+                                                >
+                                                    <Trash2 className="w-4 h-4" />
+                                                </Button>
+                                            </div>
                                         </TableCell>
                                     </TableRow>
                                 ))
@@ -153,6 +206,48 @@ export default function DepartmentManagement() {
                     </Table>
                 </div>
             </CardContent>
+
+            <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
+                <DialogContent>
+                    <form onSubmit={handleUpdateSubmit}>
+                        <DialogHeader>
+                            <DialogTitle>Editar Departamento</DialogTitle>
+                            <DialogDescription>
+                                Actualiza el nombre o el estado del departamento.
+                            </DialogDescription>
+                        </DialogHeader>
+                        <div className="grid gap-4 py-4">
+                            <div className="grid gap-2">
+                                <Label htmlFor="editName">Nombre del Departamento</Label>
+                                <Input
+                                    id="editName"
+                                    value={editName}
+                                    onChange={(e) => setEditName(e.target.value)}
+                                    placeholder="Nombre del departamento"
+                                    required
+                                />
+                            </div>
+                            <div className="flex items-center gap-2">
+                                <Switch
+                                    id="editIsActive"
+                                    checked={editIsActive}
+                                    onCheckedChange={setEditIsActive}
+                                />
+                                <Label htmlFor="editIsActive">Estado Activo</Label>
+                            </div>
+                        </div>
+                        <DialogFooter>
+                            <Button type="button" variant="outline" onClick={() => setIsEditOpen(false)}>
+                                Cancelar
+                            </Button>
+                            <Button type="submit" disabled={updateMutation.isPending}>
+                                {updateMutation.isPending && <Loader2 className="w-4 h-4 animate-spin mr-2" />}
+                                Guardar Cambios
+                            </Button>
+                        </DialogFooter>
+                    </form>
+                </DialogContent>
+            </Dialog>
         </Card>
     );
 }

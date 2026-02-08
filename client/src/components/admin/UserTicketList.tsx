@@ -48,8 +48,20 @@ export default function UserTicketList() {
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
     const [role, setRole] = useState<"user" | "technician" | "admin">("user");
+    const [department, setDepartment] = useState("");
+
+    // Helper function to get Spanish role name
+    const getRoleLabel = (role: string) => {
+        const roleMap: Record<string, string> = {
+            admin: "Administrador",
+            technician: "Soporte Técnico",
+            user: "Usuario"
+        };
+        return roleMap[role] || role;
+    };
 
     const { data: users, isLoading, refetch } = trpc.admin.getAllUsers.useQuery();
+    const { data: departments } = trpc.admin.getAllDepartments.useQuery();
     const createUser = trpc.admin.createUser.useMutation({
         onSuccess: () => {
             toast.success("Usuario creado exitosamente");
@@ -88,6 +100,7 @@ export default function UserTicketList() {
         setName("");
         setEmail("");
         setRole("user");
+        setDepartment("");
         setEditingUser(null);
     };
 
@@ -112,6 +125,7 @@ export default function UserTicketList() {
             name,
             email,
             role,
+            department,
             isActive: true,
         });
     };
@@ -134,6 +148,7 @@ export default function UserTicketList() {
             name,
             email,
             role,
+            department,
         });
     };
 
@@ -148,6 +163,7 @@ export default function UserTicketList() {
         setName(user.name || "");
         setEmail(user.email);
         setRole(user.role || "user");
+        setDepartment(user.department || "");
         setIsEditOpen(true);
     };
 
@@ -214,7 +230,7 @@ export default function UserTicketList() {
                                             />
                                         </div>
                                         <div className="grid gap-2">
-                                            <Label htmlFor="role">Rol</Label>
+                                            <Label htmlFor="role">Rol de Sistema</Label>
                                             <Select value={role} onValueChange={(value: any) => setRole(value)}>
                                                 <SelectTrigger>
                                                     <SelectValue placeholder="Selecciona un rol" />
@@ -223,6 +239,21 @@ export default function UserTicketList() {
                                                     <SelectItem value="user">Usuario</SelectItem>
                                                     <SelectItem value="technician">Soporte Técnico</SelectItem>
                                                     <SelectItem value="admin">Administrador</SelectItem>
+                                                </SelectContent>
+                                            </Select>
+                                        </div>
+                                        <div className="grid gap-2">
+                                            <Label htmlFor="department">Departamento / Área</Label>
+                                            <Select value={department} onValueChange={setDepartment}>
+                                                <SelectTrigger>
+                                                    <SelectValue placeholder="Selecciona un departamento" />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    {departments?.filter(d => d.isActive).map((dept) => (
+                                                        <SelectItem key={dept.id} value={dept.name}>
+                                                            {dept.name}
+                                                        </SelectItem>
+                                                    ))}
                                                 </SelectContent>
                                             </Select>
                                         </div>
@@ -266,7 +297,7 @@ export default function UserTicketList() {
                                 <TableRow>
                                     <TableHead>Nombre</TableHead>
                                     <TableHead>Email</TableHead>
-                                    <TableHead>Rol</TableHead>
+                                    <TableHead>Departamento / Área</TableHead>
                                     <TableHead>Estado</TableHead>
                                     <TableHead className="text-right">Acciones</TableHead>
                                 </TableRow>
@@ -280,9 +311,13 @@ export default function UserTicketList() {
                                             </TableCell>
                                             <TableCell>{user.email}</TableCell>
                                             <TableCell>
-                                                <Badge variant="outline" className="capitalize">
-                                                    {user.role}
-                                                </Badge>
+                                                {user.department ? (
+                                                    <Badge variant="outline">
+                                                        {user.department}
+                                                    </Badge>
+                                                ) : (
+                                                    <span className="text-muted-foreground text-sm italic">Sin asignar</span>
+                                                )}
                                             </TableCell>
                                             <TableCell>
                                                 {user.isActive ? (
@@ -363,7 +398,7 @@ export default function UserTicketList() {
                                 />
                             </div>
                             <div className="grid gap-2">
-                                <Label htmlFor="edit-role">Rol</Label>
+                                <Label htmlFor="edit-role">Rol de Sistema</Label>
                                 <Select value={role} onValueChange={(value: any) => setRole(value)}>
                                     <SelectTrigger>
                                         <SelectValue placeholder="Selecciona un rol" />
@@ -372,6 +407,21 @@ export default function UserTicketList() {
                                         <SelectItem value="user">Usuario</SelectItem>
                                         <SelectItem value="technician">Soporte Técnico</SelectItem>
                                         <SelectItem value="admin">Administrador</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                            <div className="grid gap-2">
+                                <Label htmlFor="edit-department">Departamento / Área</Label>
+                                <Select value={department} onValueChange={setDepartment}>
+                                    <SelectTrigger>
+                                        <SelectValue placeholder="Selecciona un departamento" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {departments?.filter(d => d.isActive).map((dept) => (
+                                            <SelectItem key={dept.id} value={dept.name}>
+                                                {dept.name}
+                                            </SelectItem>
+                                        ))}
                                     </SelectContent>
                                 </Select>
                             </div>
