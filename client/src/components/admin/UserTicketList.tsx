@@ -28,7 +28,7 @@ import {
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, Plus, Pencil, Trash2, Search } from "lucide-react";
+import { Users, Search, UserPlus, Loader2, Pencil, Trash2, CheckCircle2, XCircle, Plus } from "lucide-react";
 import { toast } from "sonner";
 
 export default function UserTicketList() {
@@ -261,11 +261,17 @@ export default function UserTicketList() {
                                                 </Badge>
                                             </TableCell>
                                             <TableCell>
-                                                <Badge
-                                                    variant={user.isActive ? "default" : "secondary"}
-                                                >
-                                                    {user.isActive ? "Activo" : "Inactivo"}
-                                                </Badge>
+                                                {user.isActive ? (
+                                                    <div className="flex items-center gap-1.5 text-green-600 font-medium text-sm">
+                                                        <CheckCircle2 className="w-4 h-4" />
+                                                        Activo
+                                                    </div>
+                                                ) : (
+                                                    <div className="flex items-center gap-1.5 text-muted-foreground font-medium text-sm">
+                                                        <XCircle className="w-4 h-4" />
+                                                        Inactivo
+                                                    </div>
+                                                )}
                                             </TableCell>
                                             <TableCell className="text-right">
                                                 <div className="flex justify-end gap-2">

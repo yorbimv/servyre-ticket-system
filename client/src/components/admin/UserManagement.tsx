@@ -23,7 +23,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
-import { Loader2, UserCog, UserPlus, Trash2, Edit2 } from "lucide-react";
+import { Loader2, UserCog, UserPlus, Trash2, Edit2, CheckCircle2, XCircle } from "lucide-react";
 import { toast } from "sonner";
 import {
     Dialog,
@@ -276,13 +276,15 @@ export function UserManagement() {
                                 </TableCell>
                                 <TableCell>
                                     {user.isActive ? (
-                                        <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
+                                        <div className="flex items-center gap-1.5 text-green-600 font-medium text-sm">
+                                            <CheckCircle2 className="w-4 h-4" />
                                             Activo
-                                        </Badge>
+                                        </div>
                                     ) : (
-                                        <Badge variant="outline" className="bg-red-50 text-red-700 border-red-200">
+                                        <div className="flex items-center gap-1.5 text-muted-foreground font-medium text-sm">
+                                            <XCircle className="w-4 h-4" />
                                             Inactivo
-                                        </Badge>
+                                        </div>
                                     )}
                                 </TableCell>
                                 <TableCell className="text-right">
