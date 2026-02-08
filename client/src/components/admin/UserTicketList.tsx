@@ -36,6 +36,7 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 import { Users, Search, UserPlus, Loader2, Pencil, Trash2, CheckCircle2, XCircle, Plus } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
 
 export default function UserTicketList() {
@@ -49,6 +50,7 @@ export default function UserTicketList() {
     const [email, setEmail] = useState("");
     const [role, setRole] = useState<"user" | "technician" | "admin">("user");
     const [department, setDepartment] = useState("");
+    const [isActive, setIsActive] = useState(true);
 
     // Helper function to get Spanish role name
     const getRoleLabel = (role: string) => {
@@ -101,6 +103,7 @@ export default function UserTicketList() {
         setEmail("");
         setRole("user");
         setDepartment("");
+        setIsActive(true);
         setEditingUser(null);
     };
 
@@ -149,6 +152,7 @@ export default function UserTicketList() {
             email,
             role,
             department,
+            isActive,
         });
     };
 
@@ -164,6 +168,7 @@ export default function UserTicketList() {
         setEmail(user.email);
         setRole(user.role || "user");
         setDepartment(user.department || "");
+        setIsActive(user.isActive);
         setIsEditOpen(true);
     };
 
@@ -424,6 +429,14 @@ export default function UserTicketList() {
                                         ))}
                                     </SelectContent>
                                 </Select>
+                            </div>
+                            <div className="flex items-center gap-2 mt-2">
+                                <Switch
+                                    id="edit-active"
+                                    checked={isActive}
+                                    onCheckedChange={setIsActive}
+                                />
+                                <Label htmlFor="edit-active">Usuario Activo</Label>
                             </div>
                         </div>
                         <DialogFooter>
