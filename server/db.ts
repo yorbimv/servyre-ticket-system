@@ -273,14 +273,20 @@ export async function updateUser(id: number, data: Partial<InsertUser>) {
   await db.update(users).set({ ...data, updatedAt: new Date() }).where(eq(users.id, id));
 }
 
-// Added hard delete function
+// Hard delete replaced with Soft delete to preserve referential integrity
 export async function deleteUser(id: number) {
-  console.log("[DB] deleteUser called for ID:", id);
+  console.log("[DB] deleteUser (soft) called for ID:", id);
   const db = await getDb();
   if (!db) throw new Error("Database not available");
 
   try {
-    const result = await db.delete(users).where(eq(users.id, id));
+    // Soft delete: set isActive to false
+    // We also scramble the openId/email if we wanted to allow re-registration,
+    // but for now just deactivating is safer for history.
+    const result = await db.update(users).set({
+      isActive: false,
+      updatedAt: new Date()
+    }).where(eq(users.id, id));
     console.log("[DB] deleteUser result:", JSON.stringify(result));
   } catch (err) {
     console.error("[DB] Error in deleteUser:", err);
