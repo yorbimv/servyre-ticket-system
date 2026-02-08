@@ -207,7 +207,7 @@ export function PriorityManagement() {
                         <TableRow>
                             <TableHead>Prioridad</TableHead>
                             <TableHead>Nivel</TableHead>
-                            <TableHead>Color</TableHead>
+
                             <TableHead>Estado</TableHead>
                             <TableHead className="text-right">Acciones</TableHead>
                         </TableRow>
@@ -230,11 +230,7 @@ export function PriorityManagement() {
                                         {priority.level}
                                     </Badge>
                                 </TableCell>
-                                <TableCell>
-                                    <code className="text-xs bg-gray-100 px-1 py-0.5 rounded">
-                                        {priority.color}
-                                    </code>
-                                </TableCell>
+
                                 <TableCell>
                                     {priority.isActive ? (
                                         <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">

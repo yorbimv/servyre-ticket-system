@@ -32,6 +32,7 @@ import {
   updateDepartment,
   deleteDepartment,
   getNextFolio,
+  deleteUser,
 } from "./db";
 import { z } from "zod";
 import {
@@ -765,16 +766,28 @@ export const appRouter = router({
         })
       )
       .mutation(async ({ input }) => {
-        // Generate a random openId for manually created users
-        const openId = `manual-${Math.random().toString(36).substring(2, 15)}`;
-        await createUser({
-          openId,
-          name: input.name,
-          email: input.email,
-          role: input.role,
-          department: input.department,
-        });
-        return { success: true };
+        try {
+          const openId = `manual-${Math.random().toString(36).substring(2, 15)}`;
+          await createUser({
+            openId,
+            name: input.name,
+            email: input.email,
+            role: input.role,
+            department: input.department,
+          });
+          return { success: true };
+        } catch (error: any) {
+          if (error.code === "ER_DUP_ENTRY") {
+            throw new TRPCError({
+              code: "CONFLICT",
+              message: "El email ya está registrado.",
+            });
+          }
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "Error al crear usuario: " + error.message,
+          });
+        }
       }),
 
     updateUser: adminProcedure
@@ -789,20 +802,33 @@ export const appRouter = router({
         })
       )
       .mutation(async ({ input }) => {
-        await updateUser(input.userId, {
-          name: input.name,
-          email: input.email,
-          role: input.role,
-          isActive: input.isActive,
-          department: input.department,
-        });
-        return { success: true };
+        try {
+          await updateUser(input.userId, {
+            name: input.name,
+            email: input.email,
+            role: input.role,
+            isActive: input.isActive,
+            department: input.department,
+          });
+          return { success: true };
+        } catch (error: any) {
+          if (error.code === "ER_DUP_ENTRY") {
+            throw new TRPCError({
+              code: "CONFLICT",
+              message: "El email ya está en uso por otro usuario.",
+            });
+          }
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "Error al actualizar usuario: " + error.message,
+          });
+        }
       }),
 
     deleteUser: adminProcedure
       .input(z.object({ id: z.number() }))
       .mutation(async ({ input }) => {
-        await updateUser(input.id, { isActive: false });
+        await deleteUser(input.id);
         return { success: true };
       }),
 

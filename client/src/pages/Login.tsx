@@ -72,7 +72,7 @@ export default function Login() {
                             <Wrench className="w-5 h-5 text-green-600 dark:text-green-400" />
                         </div>
                         <div className="text-left">
-                            <div className="font-semibold">Técnico</div>
+                            <div className="font-semibold">Soporte Técnico</div>
                             <div className="text-xs text-muted-foreground">Gestión de tickets y reportes</div>
                         </div>
                     </Button>

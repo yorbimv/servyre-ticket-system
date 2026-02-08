@@ -89,31 +89,31 @@ export default function Admin() {
 
         <Tabs defaultValue="reports" className="space-y-6">
           <TabsList className="bg-gray-100/80 dark:bg-slate-900 p-1 border dark:border-slate-800">
-            <TabsTrigger value="reports" className="gap-2">
+            <TabsTrigger value="reports" className="gap-2 data-[state=active]:bg-blue-100 dark:data-[state=active]:bg-blue-900 data-[state=active]:text-blue-700 dark:data-[state=active]:text-blue-300 transition-all">
               <FileText className="w-4 h-4" />
               Reportes
             </TabsTrigger>
-            <TabsTrigger value="users" className="gap-2">
+            <TabsTrigger value="users" className="gap-2 data-[state=active]:bg-blue-100 dark:data-[state=active]:bg-blue-900 data-[state=active]:text-blue-700 dark:data-[state=active]:text-blue-300 transition-all">
               <UserCog className="w-4 h-4" />
               Usuarios
             </TabsTrigger>
-            <TabsTrigger value="categories" className="gap-2">
+            <TabsTrigger value="categories" className="gap-2 data-[state=active]:bg-blue-100 dark:data-[state=active]:bg-blue-900 data-[state=active]:text-blue-700 dark:data-[state=active]:text-blue-300 transition-all">
               <Tags className="w-4 h-4" />
               Categorías
             </TabsTrigger>
-            <TabsTrigger value="priorities" className="gap-2">
+            <TabsTrigger value="priorities" className="gap-2 data-[state=active]:bg-blue-100 dark:data-[state=active]:bg-blue-900 data-[state=active]:text-blue-700 dark:data-[state=active]:text-blue-300 transition-all">
               <ShieldAlert className="w-4 h-4" />
               Prioridades
             </TabsTrigger>
-            <TabsTrigger value="departments" className="gap-2">
+            <TabsTrigger value="departments" className="gap-2 data-[state=active]:bg-blue-100 dark:data-[state=active]:bg-blue-900 data-[state=active]:text-blue-700 dark:data-[state=active]:text-blue-300 transition-all">
               <Building2 className="w-4 h-4" />
               Departamentos
             </TabsTrigger>
-            <TabsTrigger value="ticket-users" className="gap-2">
+            <TabsTrigger value="ticket-users" className="gap-2 data-[state=active]:bg-blue-100 dark:data-[state=active]:bg-blue-900 data-[state=active]:text-blue-700 dark:data-[state=active]:text-blue-300 transition-all">
               <UserCog className="w-4 h-4" />
               Usuarios de Tickets
             </TabsTrigger>
-            <TabsTrigger value="settings" className="gap-2">
+            <TabsTrigger value="settings" className="gap-2 data-[state=active]:bg-blue-100 dark:data-[state=active]:bg-blue-900 data-[state=active]:text-blue-700 dark:data-[state=active]:text-blue-300 transition-all">
               <Settings className="w-4 h-4" />
               Sistema
             </TabsTrigger>
@@ -200,7 +200,7 @@ export default function Admin() {
                 <div className="border border-gray-100 dark:border-slate-800 rounded-lg p-4 hover:border-blue-200 dark:hover:border-blue-800 transition-colors">
                   <h4 className="font-semibold text-sm mb-1">Roles de Usuario</h4>
                   <p className="text-sm text-gray-500 dark:text-gray-400">
-                    Cambia entre Usuario (crear tickets), Técnico (gestionar tickets) o Admin.
+                    Cambia entre Usuario (crear tickets), Soporte Técnico (gestionar tickets) o Admin.
                   </p>
                 </div>
                 <div className="border border-gray-100 dark:border-slate-800 rounded-lg p-4 hover:border-green-200 dark:hover:border-green-800 transition-colors">

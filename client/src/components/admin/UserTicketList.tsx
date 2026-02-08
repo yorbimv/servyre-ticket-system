@@ -129,7 +129,7 @@ export default function UserTicketList() {
 
     const handleDelete = (userId: number, userName: string) => {
         if (confirm(`¿Estás seguro de eliminar al usuario "${userName}"?`)) {
-            deleteUser.mutate(userId);
+            deleteUser.mutate({ id: userId });
         }
     };
 
