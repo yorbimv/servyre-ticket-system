@@ -35,7 +35,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
-import { Users, Search, UserPlus, Loader2, Pencil, Trash2, CheckCircle2, XCircle, Plus } from "lucide-react";
+import { Users, Search, UserPlus, Loader2, Pencil, CheckCircle2, XCircle, Plus } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
 
@@ -88,15 +88,7 @@ export default function UserTicketList() {
         },
     });
 
-    const deleteUser = trpc.admin.deleteUser.useMutation({
-        onSuccess: () => {
-            toast.success("Usuario eliminado exitosamente");
-            refetch();
-        },
-        onError: (error) => {
-            toast.error(error.message || "Error al eliminar usuario");
-        },
-    });
+
 
     const resetForm = () => {
         setName("");
@@ -156,11 +148,7 @@ export default function UserTicketList() {
         });
     };
 
-    const handleDelete = (userId: number, userName: string) => {
-        if (confirm(`¿Estás seguro de eliminar al usuario "${userName}"?`)) {
-            deleteUser.mutate({ id: userId });
-        }
-    };
+
 
     const openEditDialog = (user: any) => {
         setEditingUser(user);
@@ -345,13 +333,6 @@ export default function UserTicketList() {
                                                         onClick={() => openEditDialog(user)}
                                                     >
                                                         <Pencil className="w-4 h-4" />
-                                                    </Button>
-                                                    <Button
-                                                        variant="ghost"
-                                                        size="sm"
-                                                        onClick={() => handleDelete(user.id, user.name || user.email)}
-                                                    >
-                                                        <Trash2 className="w-4 h-4 text-red-600" />
                                                     </Button>
                                                 </div>
                                             </TableCell>
