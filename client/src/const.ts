@@ -6,6 +6,9 @@ export const getLoginUrl = () => {
   const appId = import.meta.env.VITE_APP_ID;
 
   if (!oauthPortalUrl) {
+    if (appId === "servyre-local") {
+      return "/login";
+    }
     return "#";
   }
 

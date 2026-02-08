@@ -54,8 +54,8 @@ export default function MyTickets() {
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">Mis Tickets</h1>
-            <p className="text-gray-600 mt-1">
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Mis Tickets</h1>
+            <p className="text-gray-600 dark:text-gray-400 mt-1">
               Visualiza y gestiona tus solicitudes de soporte
             </p>
           </div>
@@ -115,7 +115,7 @@ export default function MyTickets() {
             </CardContent>
           </Card>
         ) : (
-          <div className="bg-white rounded-lg border shadow-sm overflow-hidden">
+          <div className="bg-white dark:bg-slate-950 rounded-lg border dark:border-slate-800 shadow-sm overflow-hidden">
             <Table>
               <TableHeader>
                 <TableRow>
@@ -131,7 +131,7 @@ export default function MyTickets() {
                 {tickets.map(ticket => (
                   <TableRow
                     key={ticket.id}
-                    className="cursor-pointer hover:bg-gray-50 transition-colors"
+                    className="cursor-pointer hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors"
                     onClick={() => navigate(`/tickets/${ticket.id}`)}
                   >
                     <TableCell className="font-mono font-medium text-blue-600">

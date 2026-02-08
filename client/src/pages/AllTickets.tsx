@@ -95,10 +95,10 @@ export default function AllTickets() {
       <div className="p-6 max-w-7xl mx-auto space-y-6">
         {/* Header */}
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">
-            Gestión de Tickets
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+            Tickets Servyre
           </h1>
-          <p className="text-gray-600 mt-1">
+          <p className="text-gray-600 dark:text-gray-400 mt-1">
             Administra y resuelve todos los tickets del sistema
           </p>
         </div>
@@ -160,7 +160,7 @@ export default function AllTickets() {
             </CardContent>
           </Card>
         ) : (
-          <div className="bg-white rounded-lg border shadow-sm overflow-hidden">
+          <div className="bg-white dark:bg-slate-950 rounded-lg border dark:border-slate-800 shadow-sm overflow-hidden">
             <Table>
               <TableHeader>
                 <TableRow>
@@ -178,7 +178,7 @@ export default function AllTickets() {
                 {filteredTickets.map(ticket => (
                   <TableRow
                     key={ticket.id}
-                    className="cursor-pointer hover:bg-gray-50 transition-colors"
+                    className="cursor-pointer hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors"
                     onClick={() => navigate(`/tickets/${ticket.id}`)}
                   >
                     <TableCell className="font-mono font-medium text-blue-600">

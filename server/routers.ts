@@ -80,6 +80,64 @@ export const appRouter = router({
         success: true,
       } as const;
     }),
+    devLogin: publicProcedure
+      .input(z.object({ role: z.enum(["admin", "technician", "user"]) }))
+      .mutation(async ({ ctx, input }) => {
+        const { ENV } = await import("./_core/env");
+        if (ENV.isProduction || ENV.oAuthServerUrl) {
+          throw new TRPCError({
+            code: "FORBIDDEN",
+            message: "Dev login only available in local development",
+          });
+        }
+
+        const db = await getDb();
+        if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
+
+        const openId = `dev-${input.role}`;
+        const email = `${input.role}@local.test`;
+        const name =
+          input.role === "admin"
+            ? "Administrador"
+            : input.role === "technician"
+              ? "Técnico Local"
+              : "Usuario Local";
+
+        // Ensure user exists
+        let user = await db
+          .select()
+          .from(users)
+          .where(eq(users.openId, openId))
+          .limit(1);
+
+        if (!user.length) {
+          await createUser({
+            openId,
+            name,
+            email,
+            role: input.role,
+            department: input.role === "technician" ? "Soporte" : "General",
+          });
+        } else {
+          // Update role if changed
+          if (user[0].role !== input.role) {
+            await updateUser(user[0].id, { role: input.role });
+          }
+          // Force update name if it was the old "Admin Local" or if we want to enforce the new name
+          if (input.role === "admin" && user[0].name === "Admin Local") {
+            await updateUser(user[0].id, { name: "Administrador" });
+          }
+        }
+
+        // Create session
+        const { sdk } = await import("./_core/sdk");
+        const token = await sdk.createSessionToken(openId, { name });
+        const cookieOptions = getSessionCookieOptions(ctx.req);
+
+        ctx.res.cookie(COOKIE_NAME, token, cookieOptions);
+
+        return { success: true };
+      }),
   }),
 
   // Procedimientos para datos maestros

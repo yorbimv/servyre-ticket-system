@@ -83,12 +83,12 @@ export default function Admin() {
       <div className="p-6 max-w-6xl mx-auto space-y-6">
         {/* Header */}
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Administración</h1>
-          <p className="text-gray-600 mt-1">Gestión avanzada del sistema y analítica</p>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Administración</h1>
+          <p className="text-gray-600 dark:text-gray-400 mt-1">Gestión avanzada del sistema y analítica</p>
         </div>
 
         <Tabs defaultValue="reports" className="space-y-6">
-          <TabsList className="bg-gray-100/80 p-1 border">
+          <TabsList className="bg-gray-100/80 dark:bg-slate-900 p-1 border dark:border-slate-800">
             <TabsTrigger value="reports" className="gap-2">
               <FileText className="w-4 h-4" />
               Reportes
@@ -197,15 +197,15 @@ export default function Admin() {
                 </CardTitle>
               </CardHeader>
               <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="border border-gray-100 rounded-lg p-4 hover:border-blue-200 transition-colors">
+                <div className="border border-gray-100 dark:border-slate-800 rounded-lg p-4 hover:border-blue-200 dark:hover:border-blue-800 transition-colors">
                   <h4 className="font-semibold text-sm mb-1">Roles de Usuario</h4>
-                  <p className="text-sm text-gray-500">
+                  <p className="text-sm text-gray-500 dark:text-gray-400">
                     Cambia entre Usuario (crear tickets), Técnico (gestionar tickets) o Admin.
                   </p>
                 </div>
-                <div className="border border-gray-100 rounded-lg p-4 hover:border-green-200 transition-colors">
+                <div className="border border-gray-100 dark:border-slate-800 rounded-lg p-4 hover:border-green-200 dark:hover:border-green-800 transition-colors">
                   <h4 className="font-semibold text-sm mb-1">Categorías</h4>
-                  <p className="text-sm text-gray-500">
+                  <p className="text-sm text-gray-500 dark:text-gray-400">
                     Define las áreas problemáticas para que los usuarios clasifiquen sus peticiones.
                   </p>
                 </div>
@@ -250,7 +250,7 @@ export default function Admin() {
                     <input
                       type="text"
                       defaultValue="Servyre IT Ticket System"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-slate-700 dark:bg-slate-900 rounded-lg"
                       disabled
                     />
                   </div>
@@ -262,7 +262,7 @@ export default function Admin() {
                     <input
                       type="text"
                       defaultValue="1.0.0"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-slate-700 dark:bg-slate-900 rounded-lg"
                       disabled
                     />
                   </div>
@@ -274,7 +274,7 @@ export default function Admin() {
                   </label>
                   <textarea
                     defaultValue="Sistema de gestión de tickets de soporte IT para Servyre"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-slate-700 dark:bg-slate-900 rounded-lg"
                     rows={3}
                     disabled
                   />

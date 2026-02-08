@@ -257,22 +257,8 @@ class SDKServer {
   }
 
   async authenticateRequest(req: Request): Promise<User> {
-    // If no OAuth is configured and we are in development, use a local bypass
-    if (!ENV.oAuthServerUrl && !ENV.isProduction) {
-      console.warn("[Auth] No OAUTH_SERVER_URL configured. Using development bypass with admin user.");
-      let admin = await db.getUserByOpenId("dev-admin");
-      if (!admin) {
-        await db.upsertUser({
-          openId: "dev-admin",
-          name: "Admin Local",
-          email: "admin@local.test",
-          role: "admin",
-          lastSignedIn: new Date(),
-        });
-        admin = await db.getUserByOpenId("dev-admin");
-      }
-      return admin!;
-    }
+    // Bypass removed to enable proper login flow in development
+    // if (!ENV.oAuthServerUrl && !ENV.isProduction) { ... }
 
     // Regular authentication flow
     const cookies = this.parseCookies(req.headers.cookie);

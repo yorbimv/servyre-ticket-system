@@ -11,9 +11,12 @@ import {
   BarChart3,
   Settings,
   Home,
+  Sun,
+  Moon,
 } from "lucide-react";
 import { trpc } from "@/lib/trpc";
 import { Badge } from "@/components/ui/badge";
+import { useTheme } from "@/contexts/ThemeContext";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -30,7 +33,16 @@ export default function AppLayout({ children }: AppLayoutProps) {
   const { user, logout } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [, navigate] = useLocation();
-  const { data: unreadNotifications } = trpc.notifications.getUnread.useQuery();
+  const { data: unreadNotifications, refetch: refetchNotifications } = trpc.notifications.getUnread.useQuery();
+  const markAsReadMutation = trpc.notifications.markAsRead.useMutation({
+    onSuccess: () => {
+      refetchNotifications();
+    },
+  });
+
+  const handleNotificationClick = (id: number) => {
+    markAsReadMutation.mutate({ notificationId: id });
+  };
 
   const menuItems = [
     {
@@ -74,13 +86,14 @@ export default function AppLayout({ children }: AppLayoutProps) {
     navigate("/");
   };
 
+  const { theme, toggleTheme } = useTheme();
+
   return (
     <div className="flex h-screen bg-background">
       {/* Sidebar */}
       <aside
-        className={`${
-          sidebarOpen ? "w-64" : "w-20"
-        } bg-slate-900 text-white transition-all duration-300 flex flex-col`}
+        className={`${sidebarOpen ? "w-64" : "w-20"
+          } bg-slate-900 text-white transition-all duration-300 flex flex-col`}
       >
         {/* Logo */}
         <div className="p-4 border-b border-slate-700 flex items-center justify-between">
@@ -100,9 +113,8 @@ export default function AppLayout({ children }: AppLayoutProps) {
             <button
               key={item.href}
               onClick={() => navigate(item.href)}
-              className={`w-full flex items-center gap-3 px-4 py-2 rounded-lg transition-colors ${
-                sidebarOpen ? "" : "justify-center"
-              } hover:bg-slate-800 text-slate-300 hover:text-white`}
+              className={`w-full flex items-center gap-3 px-4 py-2 rounded-lg transition-colors ${sidebarOpen ? "" : "justify-center"
+                } hover:bg-slate-800 text-slate-300 hover:text-white`}
               title={!sidebarOpen ? item.label : ""}
             >
               <item.icon className="w-5 h-5" />
@@ -132,19 +144,32 @@ export default function AppLayout({ children }: AppLayoutProps) {
       {/* Main Content */}
       <div className="flex-1 flex flex-col">
         {/* Header */}
-        <header className="bg-white border-b border-slate-200 px-6 py-4 flex items-center justify-between">
+        <header className="bg-white dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 px-6 py-4 flex items-center justify-between transition-colors">
           <button
             onClick={() => setSidebarOpen(!sidebarOpen)}
-            className="p-2 hover:bg-slate-100 rounded-lg"
+            className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
           >
             {sidebarOpen ? (
-              <X className="w-5 h-5" />
+              <X className="w-5 h-5 dark:text-slate-200" />
             ) : (
-              <Menu className="w-5 h-5" />
+              <Menu className="w-5 h-5 dark:text-slate-200" />
             )}
           </button>
 
           <div className="flex items-center gap-4">
+            {/* Theme Toggle */}
+            <button
+              onClick={toggleTheme}
+              className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
+              title={theme === "dark" ? "Cambiar a modo claro" : "Cambiar a modo oscuro"}
+            >
+              {theme === "dark" ? (
+                <Sun className="w-5 h-5 text-yellow-500" />
+              ) : (
+                <Moon className="w-5 h-5 text-slate-600" />
+              )}
+            </button>
+
             {/* Notifications */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -167,6 +192,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
                       <DropdownMenuItem
                         key={notif.id}
                         className="flex flex-col items-start p-3 cursor-pointer"
+                        onClick={() => handleNotificationClick(notif.id)}
                       >
                         <p className="font-medium text-sm">{notif.title}</p>
                         <p className="text-xs text-muted-foreground">
