@@ -28,6 +28,13 @@ import {
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
 import { Users, Search, UserPlus, Loader2, Pencil, Trash2, CheckCircle2, XCircle, Plus } from "lucide-react";
 import { toast } from "sonner";
 
@@ -40,6 +47,7 @@ export default function UserTicketList() {
     // Form states
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
+    const [role, setRole] = useState<"user" | "technician" | "admin">("user");
 
     const { data: users, isLoading, refetch } = trpc.admin.getAllUsers.useQuery();
     const createUser = trpc.admin.createUser.useMutation({
@@ -79,6 +87,7 @@ export default function UserTicketList() {
     const resetForm = () => {
         setName("");
         setEmail("");
+        setRole("user");
         setEditingUser(null);
     };
 
@@ -102,7 +111,7 @@ export default function UserTicketList() {
             openId,
             name,
             email,
-            role: "user",
+            role,
             isActive: true,
         });
     };
@@ -124,6 +133,7 @@ export default function UserTicketList() {
             userId: editingUser.id,
             name,
             email,
+            role,
         });
     };
 
@@ -137,6 +147,7 @@ export default function UserTicketList() {
         setEditingUser(user);
         setName(user.name || "");
         setEmail(user.email);
+        setRole(user.role || "user");
         setIsEditOpen(true);
     };
 
@@ -201,6 +212,19 @@ export default function UserTicketList() {
                                                 placeholder="usuario@servyre.com"
                                                 required
                                             />
+                                        </div>
+                                        <div className="grid gap-2">
+                                            <Label htmlFor="role">Rol</Label>
+                                            <Select value={role} onValueChange={(value: any) => setRole(value)}>
+                                                <SelectTrigger>
+                                                    <SelectValue placeholder="Selecciona un rol" />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    <SelectItem value="user">Usuario</SelectItem>
+                                                    <SelectItem value="technician">Soporte Técnico</SelectItem>
+                                                    <SelectItem value="admin">Administrador</SelectItem>
+                                                </SelectContent>
+                                            </Select>
                                         </div>
                                     </div>
                                     <DialogFooter>
@@ -337,6 +361,19 @@ export default function UserTicketList() {
                                     placeholder="usuario@servyre.com"
                                     required
                                 />
+                            </div>
+                            <div className="grid gap-2">
+                                <Label htmlFor="edit-role">Rol</Label>
+                                <Select value={role} onValueChange={(value: any) => setRole(value)}>
+                                    <SelectTrigger>
+                                        <SelectValue placeholder="Selecciona un rol" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="user">Usuario</SelectItem>
+                                        <SelectItem value="technician">Soporte Técnico</SelectItem>
+                                        <SelectItem value="admin">Administrador</SelectItem>
+                                    </SelectContent>
+                                </Select>
                             </div>
                         </div>
                         <DialogFooter>
