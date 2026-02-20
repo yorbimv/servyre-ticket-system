@@ -28,7 +28,15 @@ import {
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, Plus, Pencil, Trash2, Search } from "lucide-react";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
+import { Users, Search, UserPlus, Loader2, Pencil, CheckCircle2, XCircle, Plus } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
 
 export default function UserTicketList() {
@@ -40,8 +48,22 @@ export default function UserTicketList() {
     // Form states
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
+    const [role, setRole] = useState<"user" | "technician" | "admin">("user");
+    const [department, setDepartment] = useState("");
+    const [isActive, setIsActive] = useState(true);
+
+    // Helper function to get Spanish role name
+    const getRoleLabel = (role: string) => {
+        const roleMap: Record<string, string> = {
+            admin: "Administrador",
+            technician: "Soporte Técnico",
+            user: "Usuario"
+        };
+        return roleMap[role] || role;
+    };
 
     const { data: users, isLoading, refetch } = trpc.admin.getAllUsers.useQuery();
+    const { data: departments } = trpc.admin.getAllDepartments.useQuery();
     const createUser = trpc.admin.createUser.useMutation({
         onSuccess: () => {
             toast.success("Usuario creado exitosamente");
@@ -66,19 +88,14 @@ export default function UserTicketList() {
         },
     });
 
-    const deleteUser = trpc.admin.deleteUser.useMutation({
-        onSuccess: () => {
-            toast.success("Usuario eliminado exitosamente");
-            refetch();
-        },
-        onError: (error) => {
-            toast.error(error.message || "Error al eliminar usuario");
-        },
-    });
+
 
     const resetForm = () => {
         setName("");
         setEmail("");
+        setRole("user");
+        setDepartment("");
+        setIsActive(true);
         setEditingUser(null);
     };
 
@@ -102,7 +119,8 @@ export default function UserTicketList() {
             openId,
             name,
             email,
-            role: "user",
+            role,
+            department,
             isActive: true,
         });
     };
@@ -124,19 +142,21 @@ export default function UserTicketList() {
             userId: editingUser.id,
             name,
             email,
+            role,
+            department,
+            isActive,
         });
     };
 
-    const handleDelete = (userId: number, userName: string) => {
-        if (confirm(`¿Estás seguro de eliminar al usuario "${userName}"?`)) {
-            deleteUser.mutate(userId);
-        }
-    };
+
 
     const openEditDialog = (user: any) => {
         setEditingUser(user);
         setName(user.name || "");
         setEmail(user.email);
+        setRole(user.role || "user");
+        setDepartment(user.department || "");
+        setIsActive(user.isActive);
         setIsEditOpen(true);
     };
 
@@ -202,6 +222,34 @@ export default function UserTicketList() {
                                                 required
                                             />
                                         </div>
+                                        <div className="grid gap-2">
+                                            <Label htmlFor="role">Rol de Sistema</Label>
+                                            <Select value={role} onValueChange={(value: any) => setRole(value)}>
+                                                <SelectTrigger>
+                                                    <SelectValue placeholder="Selecciona un rol" />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    <SelectItem value="user">Usuario</SelectItem>
+                                                    <SelectItem value="technician">Soporte Técnico</SelectItem>
+                                                    <SelectItem value="admin">Administrador</SelectItem>
+                                                </SelectContent>
+                                            </Select>
+                                        </div>
+                                        <div className="grid gap-2">
+                                            <Label htmlFor="department">Departamento / Área</Label>
+                                            <Select value={department} onValueChange={setDepartment}>
+                                                <SelectTrigger>
+                                                    <SelectValue placeholder="Selecciona un departamento" />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    {departments?.filter(d => d.isActive).map((dept) => (
+                                                        <SelectItem key={dept.id} value={dept.name}>
+                                                            {dept.name}
+                                                        </SelectItem>
+                                                    ))}
+                                                </SelectContent>
+                                            </Select>
+                                        </div>
                                     </div>
                                     <DialogFooter>
                                         <Button
@@ -242,7 +290,7 @@ export default function UserTicketList() {
                                 <TableRow>
                                     <TableHead>Nombre</TableHead>
                                     <TableHead>Email</TableHead>
-                                    <TableHead>Rol</TableHead>
+                                    <TableHead>Departamento / Área</TableHead>
                                     <TableHead>Estado</TableHead>
                                     <TableHead className="text-right">Acciones</TableHead>
                                 </TableRow>
@@ -256,16 +304,26 @@ export default function UserTicketList() {
                                             </TableCell>
                                             <TableCell>{user.email}</TableCell>
                                             <TableCell>
-                                                <Badge variant="outline" className="capitalize">
-                                                    {user.role}
-                                                </Badge>
+                                                {user.department ? (
+                                                    <Badge variant="outline">
+                                                        {user.department}
+                                                    </Badge>
+                                                ) : (
+                                                    <span className="text-muted-foreground text-sm italic">Sin asignar</span>
+                                                )}
                                             </TableCell>
                                             <TableCell>
-                                                <Badge
-                                                    variant={user.isActive ? "default" : "secondary"}
-                                                >
-                                                    {user.isActive ? "Activo" : "Inactivo"}
-                                                </Badge>
+                                                {user.isActive ? (
+                                                    <div className="flex items-center gap-1.5 text-green-600 font-medium text-sm">
+                                                        <CheckCircle2 className="w-4 h-4" />
+                                                        Activo
+                                                    </div>
+                                                ) : (
+                                                    <div className="flex items-center gap-1.5 text-muted-foreground font-medium text-sm">
+                                                        <XCircle className="w-4 h-4" />
+                                                        Inactivo
+                                                    </div>
+                                                )}
                                             </TableCell>
                                             <TableCell className="text-right">
                                                 <div className="flex justify-end gap-2">
@@ -275,13 +333,6 @@ export default function UserTicketList() {
                                                         onClick={() => openEditDialog(user)}
                                                     >
                                                         <Pencil className="w-4 h-4" />
-                                                    </Button>
-                                                    <Button
-                                                        variant="ghost"
-                                                        size="sm"
-                                                        onClick={() => handleDelete(user.id, user.name || user.email)}
-                                                    >
-                                                        <Trash2 className="w-4 h-4 text-red-600" />
                                                     </Button>
                                                 </div>
                                             </TableCell>
@@ -331,6 +382,42 @@ export default function UserTicketList() {
                                     placeholder="usuario@servyre.com"
                                     required
                                 />
+                            </div>
+                            <div className="grid gap-2">
+                                <Label htmlFor="edit-role">Rol de Sistema</Label>
+                                <Select value={role} onValueChange={(value: any) => setRole(value)}>
+                                    <SelectTrigger>
+                                        <SelectValue placeholder="Selecciona un rol" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="user">Usuario</SelectItem>
+                                        <SelectItem value="technician">Soporte Técnico</SelectItem>
+                                        <SelectItem value="admin">Administrador</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                            <div className="grid gap-2">
+                                <Label htmlFor="edit-department">Departamento / Área</Label>
+                                <Select value={department} onValueChange={setDepartment}>
+                                    <SelectTrigger>
+                                        <SelectValue placeholder="Selecciona un departamento" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {departments?.filter(d => d.isActive).map((dept) => (
+                                            <SelectItem key={dept.id} value={dept.name}>
+                                                {dept.name}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                            <div className="flex items-center gap-2 mt-2">
+                                <Switch
+                                    id="edit-active"
+                                    checked={isActive}
+                                    onCheckedChange={setIsActive}
+                                />
+                                <Label htmlFor="edit-active">Usuario Activo</Label>
                             </div>
                         </div>
                         <DialogFooter>
